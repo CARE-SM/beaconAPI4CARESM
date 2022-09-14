@@ -1,0 +1,4 @@
+typing
+fastapi
+pydantic
+SPARQLWrapper

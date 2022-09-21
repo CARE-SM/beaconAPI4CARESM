@@ -1,4 +1,5 @@
 from typing import List
+from unicodedata import name
 from fastapi import FastAPI
 from pydantic import BaseModel
 from SPARQLWrapper import SPARQLWrapper2
@@ -7,6 +8,8 @@ from config import config as configuration
 
 
 app = FastAPI()
+
+# POST request body definition: Nested Model
 
 class Filters(BaseModel):
     types: str
@@ -24,12 +27,20 @@ class Input(BaseModel):
     description: str
     properties: Properties
 
+
+
+
 @app.get("/")
-def read_root():
+def apiRunning():
     return {"message": "API running"}
 
 @app.post("/individuals")
 def individualsCountingQuery(input_data: Input):
+    """
+    Counting for individuals, creates modular SPARQL queries based on EJP CDE semantic models. Parameters are passed as request body where you define what data elements are you searching for. \n
+    Specifications can be found here: https://github.com/ejp-rd-vp/vp-api-specs \n
+    It retrieves JSON object that defines counted individuals as {"count" : nº of individuals} \n
+    """
 
     queryText = """
 PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
@@ -46,8 +57,11 @@ WHERE {
 ?entity a sio:SIO_000498 .
 
 """
+    # Explore all filters that are sent as Request body
     for parameter in input_data.properties.query.filters:
-        if parameter.types == "obo:NCIT_C28421": ## Sex
+
+        # In case of Sex filter is called:
+        if parameter.types == "obo:NCIT_C28421":
             sexBlock = """
 ?sexrole a sio:SIO_000016 .
 ?sexrole a obo:OBI_0000093 .
@@ -61,8 +75,8 @@ FILTER (?sexuri = {}) . """.format(parameter.ids)
 
             queryText = queryText + sexBlock
 
-            
-        elif parameter.types == "sio:SIO_001003": ## Disease
+        # In case of Disease filter is called:
+        elif parameter.types == "sio:SIO_001003":
             diseaseBlock = """
 ?diagnosis_role a sio:SIO_000016 .
 ?diagnosis_role a obo:OBI_0000093 .
@@ -76,7 +90,8 @@ FILTER (?diagnosis = {}) . """.format(parameter.ids)
             queryText = queryText + diseaseBlock
     queryText = queryText + "\n" + "}" + "\n"
 
-    sparql = SPARQLWrapper2(configuration["endpoint"])
+    # Define SPARQL connections based on modular SPARQL query created below:
+    sparql = SPARQLWrapper2(configuration["endpoint"]) # Fetch endpoint from other file
     sparql.setQuery(str(queryText))
     countValue = sparql.query().bindings[0]["count"].value
     return {"count": countValue}

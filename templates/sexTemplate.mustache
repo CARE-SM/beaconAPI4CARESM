@@ -1,0 +1,9 @@
+?sexrole a sio:SIO_000016 .
+?sexrole a obo:OBI_0000093 .
+?id sio:SIO_000020 ?sexrole .
+?entity sio:SIO_000228 ?sexrole .
+?entity sio:SIO_000008 ?sexattribute .
+
+?sexattribute a obo:NCIT_C28421 .
+?sexattribute a ?sexuri .
+FILTER (?sexuri = {{sexReference}}) . 

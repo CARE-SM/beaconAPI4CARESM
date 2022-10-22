@@ -46,6 +46,18 @@ Exemplar JSON:
 
 ```
 
+## Docker
+
+You can also build our Docker Image for this API. First you have to edit our [config.yaml]() with your credentials and then you can your Docker Image by:
+
+``` bash
+cd ejprd-counting-vp-api
+
+docker -t build ejprd-counting-vp-api .
+
+docker run --network="host" -p 8000:8000 --name ejprd-counting-vp-api ejprd-counting-vp-api
+```
+
 ## Considerations:
 
 Your endpoint MUST point to a FAIRified Triplestore that contains RDF data aligned with [EJP-RD Common Data Element Semantic Model](https://github.com/ejp-rd-vp/CDE-semantic-model)

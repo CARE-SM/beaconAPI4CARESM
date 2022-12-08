@@ -12,8 +12,8 @@ service = QuerySelection()
 # Input classes:
 
 class Filters(BaseModel):
-    types: str
-    ids: str
+    type: str
+    id: str
     operator: str
 
 class Query(BaseModel):

@@ -1,0 +1,12 @@
+ GRAPH ?{{filter}}g {
+        ?{{filter}}attribute a sio:SIO_000614 , ?{{filter}}attributeURI .
+        FILTER (?{{filter}}attributeURI {{operator}} {{value}} )
+		}
+    ?{{filter}}g a obo:NCIT_C25616 ;
+       sio:SIO_000068 ?{{filter}}timeline .
+    ?{{filter}}timeline a obo:NCIT_C54576, sio:SIO_000417;
+        sio:SIO_000332 ?{{filter}}individual .
+    ?{{filter}}individual a sio:SIO_000498 ;
+            sio:SIO_000671 ?{{filter}}individual_identifier .       
+    ?{{filter}}individual_identifier a sio:SIO_000115 ;
+            sio:SIO_000300 ?individual_id .

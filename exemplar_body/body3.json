@@ -12,6 +12,10 @@
             "type": "sio:SIO_010056",
             "id": "obo:HP_0002633",
             "operator": "="
+          },{
+            "type": "obo:NCIT_C2991",
+            "id": "ordo:Orphanet_88918",
+            "operator": "="
           }
         ]
       }

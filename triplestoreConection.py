@@ -1,15 +1,17 @@
 from SPARQLWrapper import SPARQLWrapper, JSON, POST, BASIC
 import logging
 import yaml
+import os
 
 class TripleStoreConection:
 
-    yaml_config = open("config.yaml")
-    configuration = yaml.load(yaml_config, Loader=yaml.FullLoader)
+    TRIPLESTORE_URL = os.environ['TRIPLESTORE_URL']
+    TRIPLESTORE_USERNAME = os.environ['TRIPLESTORE_USERNAME']
+    TRIPLESTORE_PASSWORD = os.environ['TRIPLESTORE_PASSWORD']
 
-    ENDPOINT = SPARQLWrapper(configuration["TRIPLESTORE_URL"])
+    ENDPOINT = SPARQLWrapper(TRIPLESTORE_URL)
     ENDPOINT.setHTTPAuth(BASIC)
-    ENDPOINT.setCredentials(configuration["TRIPLESTORE_USERNAME"], configuration["TRIPLESTORE_PASSWORD"])
+    ENDPOINT.setCredentials(TRIPLESTORE_USERNAME, TRIPLESTORE_PASSWORD)
     ENDPOINT.setMethod(POST)
 
     def get_count(self, query):

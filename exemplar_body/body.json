@@ -5,8 +5,8 @@
         "description": "string",
         "filters": [
           {
-            "types": "obo:NCIT_C28421",
-            "ids": "obo:NCIT_C16576",
+            "type": "obo:NCIT_C28421",
+            "id": "obo:NCIT_C16576",
             "operator": "="
           }
         ]

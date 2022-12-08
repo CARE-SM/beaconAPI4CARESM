@@ -1,3 +1,0 @@
-TRIPLESTORE_URL: http://127.0.0.1:7200/repositories/vp_api_repo
-TRIPLESTORE_USERNAME: admin
-TRIPLESTORE_PASSWORD: root

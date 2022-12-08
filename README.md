@@ -14,7 +14,7 @@ This API communication requires a configuration file where credentials and endpo
 ```yaml
 
 # Example:
-TRIPLESTORE_URL: http://localhost:7200/repositories/vp_api_repo # And example of a GraphDB Triplestore endpoint
+TRIPLESTORE_URL: http://localhost:7200/repositories/exemplar_vp_api_repo # And example of a GraphDB Triplestore endpoint
 TRIPLESTORE_USERNAME: admin
 TRIPLESTORE_PASSWORD: root
 ```
@@ -29,33 +29,41 @@ Exemplar JSON:
     "properties": {
       "query": {
         "description": "string",
-        "filters": [ // You can add multiple filters among all parameters documented above
+        "filters": [
           {
-            "types": "obo:NCIT_C28421",  // filter for Sex patient information
-            "ids": "obo:NCIT_C16576",  // OBO term for Female
+            "type": "obo:NCIT_C28421",
+            "id": "obo:NCIT_C16576",
             "operator": "="
           },{
-            "types": "sio:SIO_001003", // filter for disease patient information
-            "ids": "ordo:Orphanet_1398", // Orphanet code for disease
+            "type": "sio:SIO_010056",
+            "id": "obo:HP_0002633",
+            "operator": "="
+          },{
+            "type": "obo:NCIT_C2991",
+            "id": "ordo:Orphanet_88918",
             "operator": "="
           }
         ]
       }
     }
   }
-
 ```
 
 ## Docker
 
-You can also build our Docker Image for this API. First you have to edit our [config.yaml]() with your credentials and then you can your Docker Image by:
+You can also use Docker-based implementation. First, pull the latest [image](https://hub.docker.com/repository/docker/pabloalarconm/ejprd-counting-api). Then you can create a docker compose file that contains your enviromental variables with your credentials, like this:
 
-``` bash
-cd ejprd-counting-vp-api
+``` yaml
+services:
+  api:
+    image: pabloalarconm/ejprd-counting-api:0.0.2
+    ports:
+      - "8000:8000"
+    environment:
+      - TRIPLESTORE_URL=http://localhost:7200/repositories/exemplar_vp_api_repo
+      - TRIPLESTORE_USERNAME=admin
+      - TRIPLESTORE_PASSWORD=root
 
-docker -t build ejprd-counting-vp-api .
-
-docker run --network="host" -p 8000:8000 --name ejprd-counting-vp-api ejprd-counting-vp-api
 ```
 
 ## Considerations:

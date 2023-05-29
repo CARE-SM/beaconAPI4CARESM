@@ -1,0 +1,19 @@
+{
+    "description": "string",
+    "properties": {
+      "query": {
+        "description": "string",
+        "filters": [
+          {
+            "type": "obo:NCIT_C28421",
+            "id": "obo:NCIT_C16576",
+            "operator": "="
+          },{
+            "type": "obo:NCIT_C2991",
+            "id": "ordo:Orphanet_93552",
+            "operator": "="
+          }
+        ]
+      }
+    }
+  }

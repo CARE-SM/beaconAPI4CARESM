@@ -1,0 +1,7 @@
+      BIND(365 AS ?daysInYear)
+      BIND(xsd:integer(ofn:asDays(?{{cde}}date_value - ?{{cde2}}date_value)) AS ?OnsetInDays)
+    	BIND(xsd:integer(ofn:floorDiv(?OnsetInDays, ?daysInYear)) AS ?Years)	
+    	FILTER(?Years {{{operator}}} {{value}} )
+    {
+		SELECT distinct ?individual_id ?{{cde}}date_value ?{{cde2}}date_value
+        WHERE {

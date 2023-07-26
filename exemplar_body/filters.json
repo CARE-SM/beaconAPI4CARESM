@@ -1,0 +1,61 @@
+{"filters": [
+
+
+    {"_comments":"Sex" },
+    {
+        "type": "obo:NCIT_C28421",
+        "id": "obo:NCIT_C16576",
+        "operator": "="
+    },
+
+
+    {"_comments":"Disease or Disorder" },
+    {
+        "type": "obo:NCIT_C2991",
+        "id": "ordo:Orphanet_93552",
+        "operator": "="
+    },
+
+
+    {"_comments":"Phenotype" },
+    {
+        "type": "sio:SIO_010056",
+        "id": "obo:HP_0002633",
+        "operator": "="
+    },
+
+
+    {"_comments":"Causative Genes" },
+    {
+        "type": "edam:data_2295",
+        "id": "https://www.omim.org/entry/601556",
+        "operator": "="
+    },
+
+
+    {"_comments":"Age this year" },
+    {
+        "type": "obo:NCIT_C83164",
+        "id": "20",
+        "operator": ">="
+    },
+
+
+    {"_comments":"Symptom Onset" },
+    {
+        "type": "obo:NCIT_C124353",
+        "id": "7",
+        "operator": ">"
+    },
+
+
+    {"_comments":"Age at diagnosis" },
+    {
+        "type": "obo:NCIT_C156420",
+        "id": "29",
+        "operator": ">"
+    }
+
+
+]
+}

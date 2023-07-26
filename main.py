@@ -1,8 +1,11 @@
 from typing import List
 from fastapi import FastAPI
+from fastapi.responses import JSONResponse
 from pydantic import BaseModel
 import uvicorn
 from querySelection import QuerySelection
+import requests
+import yaml
 
 
 app = FastAPI()
@@ -43,6 +46,16 @@ class Response(BaseModel):
 @app.get("/")
 def apiRunning():
     return {"message": "API running"} 
+
+@app.get("/spec", response_class=JSONResponse)
+def spec():
+    try:
+        response = requests.get("https://raw.githubusercontent.com/ejp-rd-vp/vp-api-specs/main/individuals_api_v0.2.yml")
+        yaml_data = yaml.load(response.content)
+        return JSONResponse(content=yaml_data)
+    except requests.exceptions.RequestException as e:
+        print(f"Error occurred: {e}")
+        return None        
 
 @app.post("/individuals")
 def countingIndividuals(input_data:Input):

@@ -5,10 +5,16 @@
         "description": "string",
         "filters": [
           {
+            "type": "obo:NCIT_C124353",
+            "id": "7",
+            "operator": ">"
+          },
+          {
             "type": "obo:NCIT_C28421",
             "id": "obo:NCIT_C16576",
             "operator": "="
-          },{
+          },
+          {
             "type": "sio:SIO_010056",
             "id": "obo:HP_0002633",
             "operator": "="

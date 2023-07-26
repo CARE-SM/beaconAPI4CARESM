@@ -5,9 +5,9 @@
         "description": "string",
         "filters": [
           {
-            "type": "obo:NCIT_C28421",
-            "id": "obo:NCIT_C16576",
-            "operator": "="
+            "type": "obo:NCIT_C124353",
+            "id": "7",
+            "operator": ">"
           }
         ]
       }

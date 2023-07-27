@@ -6,3 +6,5 @@ SPARQLWrapper
 PyYAML
 chevron
 requests
+pyperseo
+pandas

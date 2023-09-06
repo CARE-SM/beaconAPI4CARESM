@@ -14,6 +14,8 @@ class QuerySelection:
         Specifications can be found here: https://github.com/ejp-rd-vp/vp-api-specs \n
         """
 
+
+
         with open('templates/block1_SELECT.mustache', 'r') as f:
             queryText = chevron.render(f)
 
@@ -184,9 +186,49 @@ class QuerySelection:
         queryText = queryText + Block
 
         print(queryText)
-        result = self.TRIPLE_STORE_CONECTION.get_count(queryText)
+        result = self.TRIPLE_STORE_CONECTION.get_count_individuals(queryText)
         count = result["results"]["bindings"][0]["count"]["value"]
         return count
     
+    def catalogCountingQuery(self,input_data):
+
+        endpoint = ""
+        with open('templates/catalog1_SELECT.mustache', 'r') as f:
+            queryText = chevron.render(f)
+
+        # Explore all filters that are sent as Request body
+        for parameter in input_data.properties.query.filters:
+
+            # RESOURCE_TYPE FILTER
+            if parameter.type == "rdf:type":
+                # stamp = "theme" + milisec()
+                with open('templates/catalog2a_RESOURCE_TYPE.mustache', 'r') as f:
+                    Block = chevron.render(f, {'resource_type': parameter.id})
+                queryText = queryText + Block
+
+            # THEME FILTER
+            elif parameter.type == "dcat:theme" or parameter.type =="http://www.w3.org/ns/dcat#theme":
+                stamp = "theme" + milisec()
+                with open('templates/catalog2b_THEME.mustache', 'r') as f:
+                    Block = chevron.render(f, {'theme': parameter.id,'stamp':stamp})
+                queryText = queryText + Block
+
+            # ID for endpoint
+            elif parameter.type == "dct:identifier" or parameter.type =="http://purl.org/dc/terms/identifier":
+                endpoint = parameter.id
+        
+        with open('templates/catalog3_CLOSE.mustache', 'r') as f:
+            Block = chevron.render(f, {})
+        queryText = queryText + Block
+
+
+        if endpoint == "":
+            sys.exit("No ID was defined at filters, so no endpoint is associated to this call")
+        
+
+        result = self.TRIPLE_STORE_CONECTION.get_count_catalogs(queryText, endpoint=endpoint)
+        return result
+
+
 
 

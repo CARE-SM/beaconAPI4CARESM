@@ -1,18 +1,23 @@
 from typing import List
-from fastapi import FastAPI
+from fastapi import FastAPI, Path
 from fastapi.responses import JSONResponse
 from pydantic import BaseModel
 import uvicorn
 from querySelection import QuerySelection
 import requests
 import yaml
+# from fastapi.routing import Path
+
+
 
 
 app = FastAPI()
 service = QuerySelection()
 
-
 # Input classes:
+
+class Request(BaseModel):
+    id: str
 
 class Filters(BaseModel):
     type: str
@@ -72,6 +77,27 @@ def countingIndividuals(input_data:Input):
     else:
         count_result = 0
     return Response(responseSummary={'numTotalResults': count_result, 'exists': does_data_exist})
+
+
+@app.post('/proxy/{rest_of_path:path}')
+async def catalogDiscoverability(input_data:Input, rest_of_path : str = Path(..., description="URL path with forward slashes")):
+    # SPARQL builder step:
+    sparql_creation = service.catalogCountingQuery(input_data=input_data)
+    return {
+        "endpoint": rest_of_path,
+        "queryString":sparql_creation.queryString}
+
+    # # Proxy POST step
+    # endpoint = "http://beaconproxy-sparqler/proxy"
+    # json_body = {
+    #     "endpoint": rest_of_path,
+    #     "queryString":sparql_creation.queryString}
+
+    # proxy_request = requests.post(endpoint, json=json_body)
+    # print(proxy_request)
+
+    # return {"response":proxy_request}
+
 
 if __name__ == "__main__":
     uvicorn.run(app, host="0.0.0.0", port=8000)

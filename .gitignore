@@ -1,4 +1,6 @@
 __pycache__
 .env
 exploit.sh
+DEPRECATED
+spec.yaml
 docker-compose.yaml

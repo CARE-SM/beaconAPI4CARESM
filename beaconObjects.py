@@ -1,94 +1,85 @@
-from typing import List
-from pydantic import BaseModel, Optional
+from typing import List, Optional, Union
+from pydantic import BaseModel
 
-## Catalog Request:
+## Beacon Request, same for /catalog and /individuals
 
-class CatalogRequestFilter(BaseModel):
-    id: str
-    operator: str
-    value: str
-
-class CatalogMetaContent(BaseModel):
-    apiVersion: str
-
-class CatalogRequestQuery(BaseModel):
-    filters :List[CatalogRequestFilter]
-
-class CatalogRequest(BaseModel):
-    meta: CatalogMetaContent
-    query: CatalogRequestQuery
-
-## Catalog Response:
-
-class CatalogsResults(BaseModel):
-    id: str
-    name: str
-    description: str
-    externalUrl: str
-    resourceTypes: str
-    organisation: str
-
-class ResultsetsResponseContent(BaseModel):
-    id: str
-    setType: str
-    exists: bool
-    resultsCount: int
-    results: List[CatalogsResults]
-
-class CatalogsResponseContent(BaseModel):
-    resultSets: List[ResultsetsResponseContent]
-
-
-class CatalogsResponseSummaryContent(BaseModel):
-    exists: bool
-    numTotalResults: int
-
-
-class CatalogsMetaResponseContent(BaseModel):
-    apiVersion: str
-    beaconId: str
-    returnedGranularity: str
-
-class CatalogResponse(BaseModel):
-    meta: CatalogsMetaResponseContent
-    responseSummary: CatalogsResponseSummaryContent
-    response: CatalogsResponseContent
-
-
-## Individuals Request:
-
-class RequestFilter(BaseModel):
+class AlphanumericRequestFilter(BaseModel):
     type: str
-    id: str
     operator: str
+    id: str
+
+class OntologyRequestFilter(BaseModel):
+    id: str
+    operator: Optional[str] = None
+    type: Optional[str] = None
 
 class RequestQuery(BaseModel):
-    filters: List[RequestFilter]
+    filters :List[Union[AlphanumericRequestFilter, OntologyRequestFilter]] = []
+
+# class ReturnedSchemas(BaseModel):
+#     entityType: Optional[str] = None
+#     scheme: Optional[str] = None
 
 class MetaContent(BaseModel):
     apiVersion: str
+    # beaconID: Optional[str] = None
+    # returnedSchemas: List[ReturnedSchemas] = None NO longer a requirement
 
-class IndividualRequest(BaseModel):
+class Request(BaseModel):
     meta: MetaContent
     query: RequestQuery
 
+## Catalog Response:
+
+# class CatalogsResults(BaseModel): #TODO Beacon have added v3.0 as well.
+#     # id: str
+#     name: str
+#     description: str
+#     # externalUrl: str
+#     resourceTypes: str
+#     # organisation: str
+
+# class ResultsetsResponseContent(BaseModel):
+#     id: str
+#     setType: str
+#     exists: bool
+#     resultsCount: int
+#     results: List[CatalogsResults]
+
+# class CatalogsResponseContent(BaseModel):
+#     resultSets: List[ResultsetsResponseContent]
+
+
+# class CatalogsResponseSummaryContent(BaseModel):
+#     exists: bool
+#     numTotalResults: int
+
+# class CatalogsMetaResponseContent(BaseModel):
+#     apiVersion: str
+#     beaconId: str
+#     returnedGranularity: str
+#     returnedSchemas: Optional[ReturnedSchemas] = None
+    
+# class CatalogResponse(BaseModel):
+#     meta: CatalogsMetaResponseContent
+#     responseSummary: CatalogsResponseSummaryContent
+#     response: CatalogsResponseContent
 
 ## Individual Response:
 
-class IndividualResultSets(BaseModel):
-    id: str
-    type: str
-    exists: bool
-    resultCount: int   
-
-class IndividualsResults(BaseModel):
-    resultSets: IndividualResultSets ## No very well explained in the Spec
-
-
 class IndividualResponseContent(BaseModel):
     exists: bool
-    numTotalResults: int  
+    numTotalResults: int 
 
+# class IndividualResultSets(BaseModel):
+#     id: str
+#     type: str
+#     exists: bool
+#     resultCount: int   
+
+# class IndividualsResults(BaseModel):
+#     resultSets: List[IndividualResultSets] ## No very well explained in the Spec
+ 
 class IndividualsMetaResponseContent(BaseModel):
     apiVersion: str
     beaconId: str
@@ -96,5 +87,5 @@ class IndividualsMetaResponseContent(BaseModel):
 
 class IndividualResponse(BaseModel):
     meta: IndividualsMetaResponseContent
-    response: IndividualsResults
+    #response: IndividualsResults # Blocked due to security outcome, only counts.
     responseSummary: IndividualResponseContent

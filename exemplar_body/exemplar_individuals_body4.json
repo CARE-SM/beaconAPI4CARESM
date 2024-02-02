@@ -1,0 +1,16 @@
+
+{
+  "meta": {
+      "apiVersion": "v2.0",
+      "returnedSchemas": []
+  },
+  "query": {
+      "filters": [
+        {
+          "type": "edam:data_2295",
+          "id": "https://www.ncbi.nlm.nih.gov/nuccore/NM_001128164.2",
+          "operator": "="
+      }   
+    ]
+}
+}

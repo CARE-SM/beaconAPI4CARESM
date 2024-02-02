@@ -1,9 +1,11 @@
-{
-    "description": "string",
-    "properties": {
-      "query": {
-        "description": "string",
-        "filters": [
+{ 
+  "meta":{
+    "apiVersion": "v2.0",
+    "returnedSchemas": []
+
+},
+    "query": {
+         "filters": [
           {
             "type": "obo:NCIT_C2991",
             "id": "ordo:Orphanet_93552",
@@ -15,6 +17,5 @@
             "operator": ">"
           }
         ]
-      }
-    }
-  }
+       }
+   }

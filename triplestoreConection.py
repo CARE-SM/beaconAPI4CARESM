@@ -7,15 +7,21 @@ class TripleStoreConection:
 
     def get_count_individuals(self, query):
 
-        TRIPLESTORE_URL = "https://graphdb.ejprd.semlab-leiden.nl/repositories/unifiedCDE_model"
-        TRIPLESTORE_USERNAME = "pabloa"
-        TRIPLESTORE_PASSWORD = "ejprdejprd"
+        # TRIPLESTORE_URL= "http://localhost:7200/repositories/this-cde"
+        # TRIPLESTORE_USERNAME= "admin"
+        # TRIPLESTORE_PASSWORD= "root"
+        TRIPLESTORE_URL = os.environ['TRIPLESTORE_URL']
+        TRIPLESTORE_USERNAME = os.environ['TRIPLESTORE_USERNAME']
+        TRIPLESTORE_PASSWORD = os.environ['TRIPLESTORE_PASSWORD']
 
         ENDPOINT = SPARQLWrapper(TRIPLESTORE_URL)
         ENDPOINT.setHTTPAuth(BASIC)
         ENDPOINT.setCredentials(TRIPLESTORE_USERNAME, TRIPLESTORE_PASSWORD)
         ENDPOINT.setMethod(POST)
-
+        
+        # print(TRIPLESTORE_URL)
+        # print(TRIPLESTORE_USERNAME)
+        # print(TRIPLESTORE_PASSWORD)
 
         ENDPOINT.setQuery(query)
         ENDPOINT.setReturnFormat(JSON)
@@ -26,28 +32,31 @@ class TripleStoreConection:
             logging.error("Issue with SPARQL endpoint")
             logging.error(e)
             return None
-        print(result)
         return result
     
 
-    def get_count_catalogs(self, query, endpoint):
+    # def get_count_catalogs(self, query, endpoint):
+
+    #     TRIPLESTORE_URL = "https://graphdb.ejprd.semlab-leiden.nl/repositories/wp13-fdp"
+    #     TRIPLESTORE_USERNAME = "pabloa"
+    #     TRIPLESTORE_PASSWORD = "ejprdejprd"
+
+    #     ENDPOINT = SPARQLWrapper(TRIPLESTORE_URL)
+    #     ENDPOINT.setHTTPAuth(BASIC)
+    #     ENDPOINT.setCredentials(TRIPLESTORE_USERNAME, TRIPLESTORE_PASSWORD)
+    #     ENDPOINT.setMethod(POST)
 
 
-        ENDPOINT = SPARQLWrapper(endpoint)
-        ENDPOINT.setHTTPAuth(BASIC)
-        # ENDPOINT.setCredentials(TRIPLESTORE_USERNAME, TRIPLESTORE_PASSWORD)
-        ENDPOINT.setMethod(POST)
+    #     ENDPOINT.setQuery(query)
+    #     ENDPOINT.setReturnFormat(JSON)
 
-
-        ENDPOINT.setQuery(query)
-        ENDPOINT.setReturnFormat(JSON)
-
-        # try:
-        #     result = ENDPOINT.query().convert()
-        # except Exception as e:
-        #     logging.error("Issue with SPARQL endpoint")
-        #     logging.error(e)
-        #     return None
-        # print(result)
-        return ENDPOINT
+    #     try:
+    #         result = ENDPOINT.query().convert()
+    #     except Exception as e:
+    #         logging.error("Issue with SPARQL endpoint")
+    #         logging.error(e)
+    #         return None
+        
+        
+    #     return result
     

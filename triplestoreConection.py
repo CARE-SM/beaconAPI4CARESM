@@ -7,9 +7,6 @@ class TripleStoreConection:
 
     def get_count_individuals(self, query):
 
-        # TRIPLESTORE_URL= "http://localhost:7200/repositories/this-cde"
-        # TRIPLESTORE_USERNAME= "admin"
-        # TRIPLESTORE_PASSWORD= "root"
         TRIPLESTORE_URL = os.environ['TRIPLESTORE_URL']
         TRIPLESTORE_USERNAME = os.environ['TRIPLESTORE_USERNAME']
         TRIPLESTORE_PASSWORD = os.environ['TRIPLESTORE_PASSWORD']

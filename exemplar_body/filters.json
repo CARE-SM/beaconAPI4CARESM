@@ -20,7 +20,7 @@
     {"_comments":"Phenotype" },
     {
         "type": "sio:SIO_010056",
-        "id": "obo:HP_0002633",
+        "id": "obo:HP_0003131",
         "operator": "="
     },
 
@@ -36,7 +36,7 @@
     {"_comments":"Age this year" },
     {
         "type": "obo:NCIT_C83164",
-        "id": "20",
+        "id": "1984",
         "operator": ">="
     },
 

@@ -50,7 +50,7 @@ Exemplar Beacon request with data element filter formatted in JSON:
           },
           {
             "type": "sio:SIO_010056",
-            "id": "obo:HP_0002633",
+            "id": "obo:HP_0003131",
             "operator": "="
           }
         ]
@@ -65,14 +65,23 @@ This whole implementation is Dockerized at Docker hub, check our public image [h
 You can run the docker image in a compose file that contains your environmental variables with your credentials, like this:
 
 ``` yaml
+version: '3'
 services:
   api:
-    image: pabloalarconm/ejprd-counting-api:0.0.4
+    image: pabloalarconm/ejprd-counting-api:0.0.5
     ports:
       - "8000:8000"
     environment:
       - TRIPLESTORE_URL=http://localhost:7200/repositories/exemplar_vp_api_repo
       - TRIPLESTORE_USERNAME=admin
       - TRIPLESTORE_PASSWORD=root
+
+      - FILTER_SEX=True
+      - FILTER_DISEASE=True
+      - FILTER_SYMPTOM=True
+      - FILTER_GENE_VARIANT=True
+      - FILTER_BIRTHYEAR=True
+      - FILTER_AGE_SYMPTOM_ONSET=True
+      - FILTER_AGE_DIAGNOSIS=True
 
 ```

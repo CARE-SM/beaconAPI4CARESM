@@ -1,0 +1,16 @@
+
+{
+    "meta": {
+        "apiVersion": "v2.0",
+        "returnedSchemas": []
+    },
+    "query": {
+        "filters": [
+          {
+            "type": "obo:NCIT_C2991",
+            "id": ["ordo:Orphanet_93552","ordo:Orphanet_79282"],
+            "operator": "="
+        }
+      ]
+  }
+}

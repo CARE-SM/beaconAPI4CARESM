@@ -3,6 +3,12 @@ from pydantic import BaseModel
 
 ## Beacon Request, same for /catalog and /individuals
 
+
+class AlphanumericRequestFilterList(BaseModel):
+    type: str
+    operator: str
+    id: List[str]
+    
 class AlphanumericRequestFilter(BaseModel):
     type: str
     operator: str
@@ -13,8 +19,14 @@ class OntologyRequestFilter(BaseModel):
     operator: Optional[str] = None
     type: Optional[str] = None
 
+class OntologyRequestFilterList(BaseModel):
+    id: List[str]
+    operator: Optional[str] = None
+    type: Optional[str] = None
+
+    
 class RequestQuery(BaseModel):
-    filters :List[Union[AlphanumericRequestFilter, OntologyRequestFilter]] = []
+    filters :List[Union[AlphanumericRequestFilter, OntologyRequestFilter, AlphanumericRequestFilterList, OntologyRequestFilterList]] = []
 
 # class ReturnedSchemas(BaseModel):
 #     entityType: Optional[str] = None

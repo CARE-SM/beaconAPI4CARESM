@@ -14,17 +14,7 @@ service = QueryBuilder()
 
 @app.get("/")
 def api_status():
-    return {"message": "API running"} 
-
-@app.get("/spec", response_class=JSONResponse)
-def spec():
-    try:
-        response = requests.get("https://raw.githubusercontent.com/ejp-rd-vp/vp-api-specs/main/individuals_api_v0.2.yml")
-        yaml_data = yaml.load(response.content)
-        return JSONResponse(content=yaml_data)
-    except requests.exceptions.RequestException as e:
-        print(f"Error occurred: {e}")
-        return None        
+    return {"message": "API running"}       
 
 @app.post("/individuals")
 async def individuals_counts(input_data:Request):

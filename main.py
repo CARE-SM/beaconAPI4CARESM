@@ -3,6 +3,7 @@ from fastapi.responses import JSONResponse
 import uvicorn
 import requests
 import yaml
+import os
 
 from beaconObjects import * 
 from querySelection import QueryBuilder
@@ -14,7 +15,12 @@ service = QueryBuilder()
 
 @app.get("/")
 def api_status():
-    return {"message": "API running"}       
+    return {"message": "API running"}
+
+@app.get("/filtering_terms")
+def valid_terms():
+    ask_filters = QueryBuilder.filters()
+    return ask_filters
 
 @app.post("/individuals")
 async def individuals_counts(input_data:Request):

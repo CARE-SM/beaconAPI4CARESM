@@ -12,17 +12,6 @@ This implementation follows the [EJPRD Virtual Platform API specifications for B
 
 ## Usage:
 
-beacon API configuration requires authorization from the Triplestore repository in the form of credentials. This configuration parameters are defined specified as environmental variables:
-
-```yaml
-
-# Exemplar credentials:
-
-TRIPLESTORE_URL: http://localhost:7200/repositories/exemplar_vp_api_repo
-TRIPLESTORE_USERNAME: admin
-TRIPLESTORE_PASSWORD: root
-```
-
 If you're using [FAIR-in-a-box](https://github.com/ejp-rd-vp/FiaB) (Fiab) interface to manage your healthcare data, this credential information is already configured at Fiab environmental variables.
 
 ## Beacon Request
@@ -68,7 +57,7 @@ You can run the docker image in a compose file that contains your environmental 
 version: '3'
 services:
   api:
-    image: pabloalarconm/ejprd-counting-api:0.0.5
+    image: pabloalarconm/ejprd-counting-api:0.0.7
     ports:
       - "8000:8000"
     environment:

@@ -8,6 +8,48 @@ import os
 class QueryBuilder:
 
     TRIPLE_STORE_CONECTION = triplestoreConection.TripleStoreConection()
+    
+    def filters():
+        
+        permitted_terms = []
+        
+        FILTER_SEX = os.getenv("FILTER_SEX")
+        if FILTER_SEX == "True":
+            permitted_terms.append("FILTER_SEX")
+        
+        FILTER_DISEASE = os.getenv("FILTER_DISEASE")
+        if FILTER_DISEASE == "True":
+            permitted_terms.append("FILTER_DISEASE")
+        
+        FILTER_SYMPTOM = os.getenv("FILTER_SYMPTOM")
+        if FILTER_SYMPTOM == "True":
+            permitted_terms.append("FILTER_SYMPTOM")
+        
+        FILTER_GENE_VARIANT = os.getenv("FILTER_GENE_VARIANT")
+        if FILTER_GENE_VARIANT == "True":
+            permitted_terms.append("FILTER_GENE_VARIANT")
+        
+        FILTER_BIRTHYEAR = os.getenv("FILTER_BIRTHYEAR")
+        if FILTER_BIRTHYEAR == "True":
+            permitted_terms.append("FILTER_BIRTHYEAR")
+        
+        FILTER_AGE_SYMPTOM_ONSET = os.getenv("FILTER_AGE_SYMPTOM_ONSET")
+        if FILTER_AGE_SYMPTOM_ONSET == "True":
+            permitted_terms.append("FILTER_AGE_SYMPTOM_ONSET")
+        
+        FILTER_AGE_DIAGNOSIS = os.getenv("FILTER_AGE_DIAGNOSIS")
+        if FILTER_AGE_DIAGNOSIS == "True":
+            permitted_terms.append("FILTER_AGE_DIAGNOSIS")
+            
+        return {"permitted_terms": permitted_terms} 
+    
+    def detect_number_type(self, string):
+        try:
+            # Try converting to integer
+            int_value = int(string)
+            return int_value
+        except ValueError:
+            sys.exit("You can't add non numerical nor fractional years to the filters related to Age, like AGE OF SYMPTOM ONSET and AGE OF DIAGNOSIS")
 
     def individuals_query_builder(self, input_data):
         
@@ -18,6 +60,14 @@ class QueryBuilder:
         FILTER_BIRTHYEAR = str(os.getenv("FILTER_BIRTHYEAR"))
         FILTER_AGE_SYMPTOM_ONSET = str(os.getenv("FILTER_AGE_SYMPTOM_ONSET"))
         FILTER_AGE_DIAGNOSIS = str(os.getenv("FILTER_AGE_DIAGNOSIS"))
+        
+        # FILTER_SEX= "True"
+        # FILTER_DISEASE= "True"
+        # FILTER_SYMPTOM= "True"
+        # FILTER_GENE_VARIANT= "True"
+        # FILTER_BIRTHYEAR= "True"
+        # FILTER_AGE_SYMPTOM_ONSET= "True"
+        # FILTER_AGE_DIAGNOSIS= "True"
 
         with open('templates/block1_SELECT.mustache', 'r') as f:
             queryText = chevron.render(f)
@@ -27,9 +77,10 @@ class QueryBuilder:
             
             list_filters_used = []
             symp_info = {}
-            onset_info = {}    
-             
+            onset_info = {} 
+            
             for parameter in input_data.query.filters:
+                                                
                 if parameter.type:
                     list_filters_used += [parameter.type]
             if ("sio:SIO_010056" in list_filters_used or "http://semanticscience.org/resource/SIO_010056" in list_filters_used) and ("obo:NCIT_C124353" in list_filters_used or "http://purl.obolibrary.org/obo/NCIT_C124353" in list_filters_used):
@@ -39,8 +90,10 @@ class QueryBuilder:
                             symp_info = parameter
 
                         elif parameter.type == "obo:NCIT_C124353" or parameter.type =="http://purl.obolibrary.org/obo/NCIT_C124353":
-                            onset_info = parameter               
-
+                            onset_info = parameter        
+                                   
+                    parameter_checked = self.detect_number_type(onset_info.id)
+                            
                     # Symptom + Symptom Onset FILTER
                     with open('templates/block1b_BIND.mustache', 'r') as f:
                         Block = chevron.render(f, {'value': onset_info.id, 'operator': onset_info.operator ,'cde':"onset", "cde2":"birthdate"})
@@ -189,8 +242,11 @@ class QueryBuilder:
                     # AGE_OF_SYMPTOM FILTER:
                     elif ("sio:SIO_010056" not in list_filters_used and "http://semanticscience.org/resource/SIO_010056" not in list_filters_used) and ("obo:NCIT_C124353" in list_filters_used or "http://purl.obolibrary.org/obo/NCIT_C124353" in list_filters_used):
                         if FILTER_AGE_SYMPTOM_ONSET == "True":
+                            
+                            parameter_checked = self.detect_number_type(parameter.id)
+                            
                             with open('templates/block1b_BIND.mustache', 'r') as f:
-                                Block = chevron.render(f, {'value': parameter.id, 'operator': parameter.operator ,'cde':"onset", "cde2":"birthdate"})
+                                Block = chevron.render(f, {'value': parameter_checked, 'operator': parameter.operator ,'cde':"onset", "cde2":"birthdate"})
                             queryText = queryText + Block
                             with open('templates/block2_GENERAL.mustache', 'r') as f:
                                 Block = chevron.render(f, {'value': "obo:NCIT_C68615", 'operator': "=" ,'cde':"birthdate"})
@@ -226,9 +282,11 @@ class QueryBuilder:
                     # AGE_AT_DIAGNOSIS:
                     elif parameter.type == "obo:NCIT_C156420" or parameter.type == "http://purl.obolibrary.org/obo/NCIT_C156420":
                         if FILTER_AGE_DIAGNOSIS == "True":
+                            
+                            parameter_checked = self.detect_number_type(parameter.id)
 
                             with open('templates/block1b_BIND.mustache', 'r') as f:
-                                Block = chevron.render(f, {'value': parameter.id, 'operator': parameter.operator ,'cde':"onset", "cde2":"birthdate"})
+                                Block = chevron.render(f, {'value': parameter_checked, 'operator': parameter.operator ,'cde':"onset", "cde2":"birthdate"})
                             queryText = queryText + Block
                             with open('templates/block2_GENERAL.mustache', 'r') as f:
                                 Block = chevron.render(f, {'value': "obo:NCIT_C68615", 'operator': "=" ,'cde':"birthdate"})

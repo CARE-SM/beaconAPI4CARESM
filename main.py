@@ -1,17 +1,28 @@
-from fastapi import FastAPI, Path
-from fastapi.responses import JSONResponse
+from fastapi import FastAPI #, Path
+# from fastapi.responses import JSONResponse
+from fastapi.openapi.utils import get_openapi
 import uvicorn
-import requests
-import yaml
+# import requests
+# import yaml
 import os
 
 from beaconObjects import * 
 from querySelection import QueryBuilder
 
 app = FastAPI(
-    title="Beacon API")
+    title="Beacon API",openapi_url="/openapi.json", openapi_route="/openapi.json")
 
 service = QueryBuilder()
+
+# URL_SERVER = os.getenv("URL_SERVER")
+# URL_SERVER = "https://graphdb.ejprd.semlab-leiden.nl/repositories/unifiedCDE_model"
+        
+# def custom_openapi():
+#     openapi_schema = get_openapi(title="Beacon-API for CARE-SM ", version="0.0.8", routes=app.routes)
+#     openapi_schema["servers"] = [{"url": URL_SERVER}]
+#     return openapi_schema
+
+# app.openapi = custom_openapi
 
 @app.get("/")
 def api_status():

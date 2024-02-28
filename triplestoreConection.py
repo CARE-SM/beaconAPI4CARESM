@@ -15,10 +15,6 @@ class TripleStoreConection:
         ENDPOINT.setHTTPAuth(BASIC)
         ENDPOINT.setCredentials(TRIPLESTORE_USERNAME, TRIPLESTORE_PASSWORD)
         ENDPOINT.setMethod(POST)
-        
-        # print(TRIPLESTORE_URL)
-        # print(TRIPLESTORE_USERNAME)
-        # print(TRIPLESTORE_PASSWORD)
 
         ENDPOINT.setQuery(query)
         ENDPOINT.setReturnFormat(JSON)

@@ -1,22 +1,51 @@
 # Beacon API for CARE-SM patient data 
 
-Beacon API prepared to obtain anonymous counts from [CARE Semantic Model.](https://github.com/CARE-SM/CARE-Semantic-Model)-based patient data registries. This implementation transforms Beacon HTTP POST requests into CARE-SM compatible SPARQL counting queries for patient data information. These counting outcomes are based on the filters defined at the Beacon request. After the execution of these queries, the anonymous counting information is transformed into a Beacon Response and retrieved as API responses.
+Beacon API for [CARE Semantic Model.](https://github.com/CARE-SM/CARE-Semantic-Model) to perform anonymous patient counts from data registries. This implementation converts Beacon Requests into CARE-SM SPARQL counting query, retrieving a Beacon-compliant JSON Response with the anonymous outcome.
 
 ### Considerations:
 
-This beacon API is meanted to point to a TripleStore repository with CARE-SM-based patient data. The SPARQL query that this implementation creates is only compatible with CARE Semantic Model.
+Beacon-API4CARE-SM is only compatible with Triplestore repositories that contain CARE-Semantic Model patient data. 
 
 ## Documentation:
 
-This implementation follows the [EJPRD Virtual Platform API specifications for Beacon API v.2.0](https://github.com/ejp-rd-vp/vp-api-specs) at Github
+This implementation follows the [EJPRD Virtual Platform API specifications for Beacon API v.2.0](https://github.com/ejp-rd-vp/vp-api-specs) at Github.
 
-## Usage:
+## Usage and Docker
 
-If you're using [FAIR-in-a-box](https://github.com/ejp-rd-vp/FiaB) (Fiab) interface to manage your healthcare data, this credential information is already configured at Fiab environmental variables.
+This whole implementation is Dockerized at Docker hub, check our public image [here](https://hub.docker.com/repository/docker/pabloalarconm/ejprd-counting-api). Feel free to implement our docker image next to your TripleStore with CARE-SM patient data.
+
+This beacon API consumes environmental variables for all required parameters related to triplestore credentials (endpoint/username/password) and all available filters to query.
+
+You can run the docker image in a `docker-compose` file that contains your environmental variables with your credentials, like this:
+
+``` yaml
+version: '3'
+services:
+  api:
+    image: pabloalarconm/ejprd-counting-api:0.0.9
+    ports:
+      - "8000:8000"
+    environment:
+      - TRIPLESTORE_URL=http://localhost:7200/repositories/exemplar_vp_api_repo
+      - TRIPLESTORE_USERNAME=admin
+      - TRIPLESTORE_PASSWORD=root
+      - URL_SERVER=http://0.0.0.0:8000/
+
+      - FILTER_SEX=True
+      - FILTER_DISEASE=True
+      - FILTER_SYMPTOM=True
+      - FILTER_GENE_VARIANT=True
+      - FILTER_BIRTHYEAR=True
+      - FILTER_AGE_SYMPTOM_ONSET=True
+      - FILTER_AGE_DIAGNOSIS=True
+
+```
+
+This beacon-API4CARE-SM is already deployed at [FAIR-in-a-box](https://github.com/ejp-rd-vp/FiaB) (Fiab) interface.
 
 ## Beacon Request
 
-Exemplar Beacon request with data element filter formatted in JSON:
+Exemplar Beacon JSON complaint request containing filter. For more examples, please check your [exemplar_body](/exemplar_body/) folder.
 
 ```json
 { 
@@ -47,30 +76,3 @@ Exemplar Beacon request with data element filter formatted in JSON:
    }
 ```
 
-## Docker
-
-This whole implementation is Dockerized at Docker hub, check our public image [here](https://hub.docker.com/repository/docker/pabloalarconm/ejprd-counting-api). 
-
-You can run the docker image in a compose file that contains your environmental variables with your credentials, like this:
-
-``` yaml
-version: '3'
-services:
-  api:
-    image: pabloalarconm/ejprd-counting-api:0.0.7
-    ports:
-      - "8000:8000"
-    environment:
-      - TRIPLESTORE_URL=http://localhost:7200/repositories/exemplar_vp_api_repo
-      - TRIPLESTORE_USERNAME=admin
-      - TRIPLESTORE_PASSWORD=root
-
-      - FILTER_SEX=True
-      - FILTER_DISEASE=True
-      - FILTER_SYMPTOM=True
-      - FILTER_GENE_VARIANT=True
-      - FILTER_BIRTHYEAR=True
-      - FILTER_AGE_SYMPTOM_ONSET=True
-      - FILTER_AGE_DIAGNOSIS=True
-
-```

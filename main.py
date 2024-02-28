@@ -10,27 +10,26 @@ from beaconObjects import *
 from querySelection import QueryBuilder
 
 app = FastAPI(
-    title="Beacon API",openapi_url="/openapi.json", openapi_route="/openapi.json")
+    title="Beacon-API for CARE-SM", version="0.0.8", openapi_url="/openapi.json", openapi_route="/openapi.json") 
 
 service = QueryBuilder()
+# URL_SERVER="http://0.0.0.0:8000/"
+URL_SERVER = os.getenv("URL_SERVER")
 
-# URL_SERVER = os.getenv("URL_SERVER")
-# URL_SERVER = "https://graphdb.ejprd.semlab-leiden.nl/repositories/unifiedCDE_model"
-        
-# def custom_openapi():
-#     openapi_schema = get_openapi(title="Beacon-API for CARE-SM ", version="0.0.8", routes=app.routes)
-#     openapi_schema["servers"] = [{"url": URL_SERVER}]
-#     return openapi_schema
+def custom_openapi():
+    openapi_schema = get_openapi(title="Beacon-API for CARE-SM ", version="0.0.8", routes=app.routes)
+    openapi_schema["servers"] = [{"url": URL_SERVER}]
+    return openapi_schema
 
-# app.openapi = custom_openapi
+app.openapi = custom_openapi
 
 @app.get("/")
-def api_status():
+def api_ejstatus():
     return {"message": "API running"}
 
 @app.get("/filtering_terms")
 def valid_terms():
-    ask_filters = QueryBuilder.filters()
+    ask_filters = service.filters()
     return ask_filters
 
 @app.post("/individuals")

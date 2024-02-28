@@ -12,7 +12,7 @@ This implementation follows the [EJPRD Virtual Platform API specifications for B
 
 ## Usage and Docker
 
-This whole implementation is Dockerized at Docker hub, check our public image [here](https://hub.docker.com/repository/docker/pabloalarconm/ejprd-counting-api). Feel free to implement our docker image next to your TripleStore with CARE-SM patient data.
+This whole implementation is Dockerized at Docker hub, check our public image [here](https://hub.docker.com/repository/docker/pabloalarconm/beacon-api4care-sm/). Feel free to implement our docker image next to your TripleStore with CARE-SM patient data.
 
 This beacon API consumes environmental variables for all required parameters related to triplestore credentials (endpoint/username/password) and all available filters to query.
 
@@ -22,7 +22,7 @@ You can run the docker image in a `docker-compose` file that contains your envir
 version: '3'
 services:
   api:
-    image: pabloalarconm/ejprd-counting-api:0.0.9
+    image: pabloalarconm/beacon-api4care-sm:0.1.0
     ports:
       - "8000:8000"
     environment:

@@ -1,12 +1,9 @@
-from fastapi import FastAPI #, Path
-# from fastapi.responses import JSONResponse
+from fastapi import FastAPI, HTTPException, Request
 from fastapi.openapi.utils import get_openapi
 import uvicorn
-# import requests
-# import yaml
 import os
 
-from beaconObjects import * 
+from beaconObjects import IndividualResponse
 from querySelection import QueryBuilder
 
 app = FastAPI(
@@ -23,6 +20,10 @@ def custom_openapi():
 
 app.openapi = custom_openapi
 
+@app.exception_handler(Exception)
+async def generic_exception_handler(request: Request, exc: Exception):
+    return {"detail": f"Internal server error: {exc}"}, 500
+
 @app.get("/")
 def api_ejstatus():
     return {"message": "API running"}
@@ -33,24 +34,19 @@ def valid_terms():
     return ask_filters
 
 @app.post("/individuals")
-async def individuals_counts(input_data:Request):
-
-    count_result = service.individuals_query_builder(input_data=input_data)
-
-    does_data_exist = False
-    if count_result is not None:
-        does_data_exist = True
-    else:
-        count_result = 0
-
-    return IndividualResponse(
-        meta={
-            'apiVersion': input_data.meta.apiVersion, 
-            'beaconId': "undefined beacon ID", #TODO try to pass beaconId from the request
-            'returnedGranularity': "record"},
-        responseSummary={
-            'numTotalResults': count_result,
-            'exists': does_data_exist})
+async def individuals_counts(input_data: Request):
+    try:
+        count_result = service.individuals_query_builder(input_data=input_data)
+        does_data_exist = count_result is not None
+        return IndividualResponse(
+            meta={'apiVersion': input_data.meta.apiVersion, 
+                  'beaconId': "undefined beacon ID", 
+                  'returnedGranularity': "record"},
+            responseSummary={
+                'numTotalResults': count_result or 0,
+                'exists': does_data_exist})
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
 
 # @app.post('/proxy/{rest_of_path:path}')
 # async def catalogDiscoverability(input_data:Request, rest_of_path : str = Path(..., description="URL path with forward slashes")):

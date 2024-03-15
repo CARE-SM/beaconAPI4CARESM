@@ -1,6 +1,10 @@
 GRAPH ?{{cde}}g {
-        ?{{cde}}role sio:SIO_000356 ?{{cde}}process ;  a sio:SIO_000016 .
-        ?{{cde}}process a sio:SIO_000006 , ?{{cde}}process_type ; sio:SIO_000339 ?{{cde}}protocol; sio:SIO_000291 ?{{cde}}target; sio:SIO_000229 ?{{cde}}output. FILTER (?{{cde}}process_type != sio:SIO_000006) .
-        ?{{cde}}output sio:SIO_000628 ?{{cde}}attribute; a sio:SIO_000015.
-        ?{{cde}}attribute a sio:SIO_000614, ?{{cde}}attribute_type. FILTER(?{{cde}}attribute_type {{operator}} {{value}} ) .
-        ?{{cde}}protocol a sio:SIO_001043; sio:SIO_000008 ?{{cde}}activity .
+        ?{{cde}}role sio:SIO_000356 ?{{cde}}process ; a sio:SIO_000016 .
+        ?{{cde}}process a sio:SIO_000006 , ?{{cde}}process_type ; sio:SIO_000291 ?{{cde}}target; sio:SIO_000229 ?{{cde}}output .
+        ?{{cde}}output a sio:SIO_000015, ?{{cde}}output_type; sio:SIO_000628 ?{{cde}}attribute.
+        ?{{cde}}attribute a sio:SIO_000614, ?{{cde}}attribute_type. 
+        ?{{cde}}target a sio:SIO_000015, ?{{cde}}target_type.
+        FILTER(?{{cde}}process_type != sio:SIO_000006) .
+        FILTER(?{{cde}}target_type {{{operator_target}}} {{target}}).
+        FILTER(?{{cde}}attribute_type {{{operator_attribute}}} {{attribute}} ) .
+        FILTER(?{{cde}}output_type {{{operator_output}}} {{output}} ) .

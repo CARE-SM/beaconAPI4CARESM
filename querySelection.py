@@ -111,7 +111,8 @@ class QueryBuilder:
                                         'operator_output': "=",
                                         'output': "obo:NCIT_C154625",
                                         'cde':stamp})  
-                                    
+                                queryText = queryText + Block
+
                             elif isinstance(parameter.id, list):
                                 curated_values = self.curate_values(parameter.id)
 
@@ -155,6 +156,7 @@ class QueryBuilder:
                                         'operator_output': "=",
                                         'output': "sio:SIO_000015",
                                         'cde':stamp}) 
+                                queryText = queryText + Block
                                                                        
                             elif isinstance(parameter.id, list):
                                 curated_values = self.curate_values(parameter.id)
@@ -168,6 +170,7 @@ class QueryBuilder:
                                         'operator_output': "=",
                                         'output': "sio:SIO_000015",
                                         'cde':stamp})     
+                                queryText = queryText + Block
                                     
                                 with open('templates/block4_VALUES.mustache', 'r') as f:
                                     Block = chevron.render(f, {
@@ -176,7 +179,6 @@ class QueryBuilder:
                                         'cde':stamp})                                       
                                 queryText = queryText + Block      
                                     
-                            queryText = queryText + Block
                             with open('templates/block5_CONTEXT.mustache', 'r') as f:
                                 Block = chevron.render(f, {'cde':stamp})
                             queryText = queryText + Block
@@ -370,7 +372,8 @@ class QueryBuilder:
                                         'operator_output': "=",
                                         'output': "obo:NCIT_C154625",
                                         'cde':stamp})  
-                                    
+                                queryText = queryText + Block
+                                   
                             elif isinstance(parameter.id, list):
                                 curated_values = self.curate_values(parameter.id)
 
@@ -432,7 +435,6 @@ class QueryBuilder:
                     queryText = queryText + Block
 
                     if isinstance(symp_info.id, str):
-
                         with open('templates/block2_GENERAL.mustache', 'r') as f:                    
                             Block = chevron.render(f, {
                                 'operator_target': symp_info.operator,
@@ -442,7 +444,8 @@ class QueryBuilder:
                                 'operator_output': "=",
                                 'output': "sio:SIO_000015",
                                 'cde':"s_onset"})  
-                            
+                        queryText = queryText + Block
+     
                     elif isinstance(symp_info.id, list):
                         
                         curated_values = self.curate_values(symp_info.id)
@@ -456,7 +459,8 @@ class QueryBuilder:
                                 'operator_output': "=",
                                 'output': "sio:SIO_000015",
                                 'cde':"s_onset"})                         
-                        queryText = queryText + Block      
+                        queryText = queryText + Block   
+                           
                         with open('templates/block4_VALUES.mustache', 'r') as f:
                             Block = chevron.render(f, {
                                 'instance': "target_type",

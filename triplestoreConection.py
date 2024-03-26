@@ -2,6 +2,7 @@ from SPARQLWrapper import SPARQLWrapper, JSON, POST, BASIC
 import logging
 import os
 
+
 class TripleStoreConection:
 
     def get_count_individuals(self, query):

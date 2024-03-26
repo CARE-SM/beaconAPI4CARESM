@@ -1,17 +1,26 @@
 from fastapi import FastAPI, HTTPException
 from fastapi.openapi.utils import get_openapi
+from fastapi.middleware.cors import CORSMiddleware
 import uvicorn
 import os
 
 from beaconObjects import IndividualResponse, Request
 from querySelection import QueryBuilder
 
+# URL_SERVER="http://0.0.0.0:8000/"
+URL_SERVER = os.getenv("URL_SERVER")
+
 app = FastAPI(
     title="Beacon-API for CARE-SM", version="0.0.8", openapi_url="/openapi.json", openapi_route="/openapi.json") 
 
+# app.add_middleware(
+#     CORSMiddleware,
+#     allow_origins=["*"],
+#     allow_methods=["*"],
+#     allow_headers=["*"],
+# )
+
 service = QueryBuilder()
-# URL_SERVER="http://0.0.0.0:8000/"
-URL_SERVER = os.getenv("URL_SERVER")
 
 def custom_openapi():
     openapi_schema = get_openapi(title="Beacon-API for CARE-SM ", version="0.0.8", routes=app.routes)
@@ -19,10 +28,6 @@ def custom_openapi():
     return openapi_schema
 
 app.openapi = custom_openapi
-
-# @app.exception_handler(Exception)
-# async def generic_exception_handler(request: Request, exc: Exception):
-#     return {"detail": f"Internal server error: {exc}"}, 500
 
 @app.get("/")
 def api_ejstatus():

@@ -3,11 +3,9 @@
 Beacon API for patient data discoverability represented using [CARE Semantic Model](https://github.com/CARE-SM/CARE-Semantic-Model). 
 
 <p align="center"> 
-	<img src="https://raw.githubusercontent.com/beaconAPI4CARESM/blob/master/beacon4caresm.png> 
-  <!-- "width="600" height="350" -->
-<p align="center" > </p> 
+	<img src="beacon4caresm.png"width="75%">
+</p>
 <p align="center"><b>beacon API architecture</b></p>
-<hr>
 
 
 This Beacon API converts Beacon Requests for individuals into CARE-SM SPARQL counting queries. After executing the query, it retrieves a Beacon Response. This implementation does not expose any sensitive patient data; only the count is included in the response.

@@ -3,12 +3,10 @@ import chevron
 from perseo.main import milisec
 import sys
 import os
-# from ageCalculation import AgeCalculation
 
 class QueryBuilder:
 
     TRIPLE_STORE_CONECTION = triplestoreConection.TripleStoreConection()
-    permitted_terms = []
     
     # FILTER_SEX= "True"
     # FILTER_DISEASE= "True"
@@ -26,23 +24,138 @@ class QueryBuilder:
     FILTER_AGE_SYMPTOM_ONSET = os.getenv("FILTER_AGE_SYMPTOM_ONSET")
     FILTER_AGE_DIAGNOSIS = os.getenv("FILTER_AGE_DIAGNOSIS")
     
-    if FILTER_SEX == "True":
-        permitted_terms.append("FILTER_SEX")    
-    if FILTER_DISEASE == "True":
-        permitted_terms.append("FILTER_DISEASE")
-    if FILTER_SYMPTOM == "True":
-        permitted_terms.append("FILTER_SYMPTOM")
-    if FILTER_GENE_VARIANT == "True":
-        permitted_terms.append("FILTER_GENE_VARIANT")
-    if FILTER_BIRTHYEAR == "True":
-        permitted_terms.append("FILTER_BIRTHYEAR")
-    if FILTER_AGE_SYMPTOM_ONSET == "True":
-        permitted_terms.append("FILTER_AGE_SYMPTOM_ONSET")
-    if FILTER_AGE_DIAGNOSIS == "True":
-        permitted_terms.append("FILTER_AGE_DIAGNOSIS")
-    
-    def filters(self):
-        return {"permitted_terms": self.permitted_terms} 
+    def filtering_CURIE(self):
+        permitted_terms = []
+        curie_formats = []
+        
+        obo_curie_format={
+            "id": "ncit",
+            "name": "NCIT",
+            "url": "http://purl.obolibrary.org/obo/ncit.owl",
+            "version": "2023-101-19",
+            "namespacePrefix": "obo",
+            "iriPrefix": "http://purl.obolibrary.org/obo/"
+        }
+        curie_formats.append(obo_curie_format)   
+        
+        if self.FILTER_SEX == "True":
+            sex_resource={
+                "id": "ncit:C28421",
+                "label": "Sex",
+                "type": "ontology",
+                "scopes": [
+                "individuals"
+                ]
+            }
+            permitted_terms.append(sex_resource)    
+            
+        if self.FILTER_DISEASE == "True":
+            disease_resource={
+                "id": "ncit:C2991",
+                "label": "Disease or Disorder",
+                "type": "ontology",
+                "scopes": [
+                "individuals"
+                ]
+            }  
+            permitted_terms.append(disease_resource)   
+            
+            ordo_curie={
+                "id": "ordo",
+                "name": "Orphanet Ontology",
+                "url": "https://www.orphadata.com/data/ontologies/ordo/last_version/ORDO_en_4.4.owl",
+                "version": "4.4",
+                "namespacePrefix": "ordo",
+                "iriPrefix": "http://www.orpha.net/ORDO/"
+            }
+            curie_formats.append(ordo_curie)   
+
+        if self.FILTER_SYMPTOM == "True":
+            phenotype_resource={
+                "id": "sio:SIO_010056",
+                "label": "Phenotype",
+                "type": "ontology",
+                "scopes": [
+                "individuals"
+                ]
+            }  
+            permitted_terms.append(phenotype_resource)    
+            
+            hpo_curie={
+                "id": "hp",
+                "name": "Human Phenotype Ontology",
+                "url": "http://purl.obolibrary.org/obo/hp.owl",
+                "version": "2024-07-01",
+                "namespacePrefix": "hp",
+                "iriPrefix": "http://purl.obolibrary.org/obo/HP_"
+            }
+            curie_formats.append(hpo_curie) 
+            
+            sio_curie={
+                "id": "sio",
+                "name": "Semanticscience Integrated Ontology",
+                "url": "http://semanticscience.org/ontology/sio/v1.59/sio-release.owl",
+                "version": "1.59",
+                "namespacePrefix": "sio",
+                "iriPrefix": "http://semanticscience.org/resource/"
+            }
+            curie_formats.append(sio_curie)   
+
+        if self.FILTER_GENE_VARIANT == "True":
+            genotype_resource={
+                "id": "edam:data_2295",
+                "label": "Causative Genes",
+                "type": "alphanumerical",
+                "scopes": [
+                "individuals"
+                ]
+            }
+            permitted_terms.append(genotype_resource) 
+            
+            edam_curie={
+                "id": "edam",
+                "name": "EDAM",
+                "url": "https://edamontology.org/EDAM_1.25.owl",
+                "version": "1.21",
+                "namespacePrefix": "edam",
+                "iriPrefix": "http://edamontology.org/"
+            }
+            curie_formats.append(edam_curie)   
+            
+        if self.FILTER_BIRTHYEAR == "True":
+            birthyear_resource={
+                "id": "ncit:C83164",
+                "label": "Age this year",
+                "type": "numeric",
+                "scopes": [
+                "individuals"
+                ]
+            }
+            permitted_terms.append(birthyear_resource) 
+
+        if self.FILTER_AGE_SYMPTOM_ONSET == "True":
+            symptom_onset_resource={
+                "id": "ncit:C124353",
+                "label": "Age at symptom onset",
+                "type": "numeric",
+                "scopes": [
+                "individuals"
+                ]
+            }           
+            permitted_terms.append(symptom_onset_resource) 
+            
+        if self.FILTER_AGE_DIAGNOSIS == "True":
+            age_diagnosis_onset_resource={
+                "id": "ncit:C156420",
+                "label": "Age at diagnosis",
+                "type": "numeric",
+                "scopes": [
+                    "individuals"
+                ]
+            }
+            permitted_terms.append(age_diagnosis_onset_resource)
+            
+        return permitted_terms, curie_formats
     
     def detect_number_type(self, string):
         try:

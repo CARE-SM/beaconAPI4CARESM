@@ -3,11 +3,15 @@ from fastapi.openapi.utils import get_openapi
 from fastapi.middleware.cors import CORSMiddleware
 import uvicorn
 import os
+from perseo.main import milisec
 
-from beaconObjects import IndividualResponse, Request
+from models.beaconIndividualRequest import IndividualRequest
+from models.beaconIndividualResponse import IndividualResponse
+from models.curie import CURIEFiltering
+
 from querySelection import QueryBuilder
 
-# URL_SERVER="http://0.0.0.0:8000/"
+# URL_SERVER="http://127.0.0.1:8000/"
 URL_SERVER = os.getenv("URL_SERVER")
 
 app = FastAPI(
@@ -34,22 +38,46 @@ def api_ejstatus():
     return {"message": "API running"}
 
 @app.get("/filtering_terms")
-def valid_terms():
-    ask_filters = service.filters()
-    return ask_filters
+def valid_terms_for_filtering():
+    try:
+        filters, curie = service.filtering_CURIE()
+        return CURIEFiltering(
+            meta={
+                'beaconId': "undefined beacon ID", 
+                'apiVersion': "v4.0", 
+                'returnedSchemas': []
+            },
+            response={
+                'resources': curie,
+                'filteringTerms': filters
+            }
+        )
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
 
 @app.post("/individuals")
-async def individuals_counts(input_data: Request):
+async def individuals_counts(input_data: IndividualRequest):
     try:
         count_result = service.individuals_query_builder(input_data=input_data)
         does_data_exist = count_result is not None
         return IndividualResponse(
-            meta={'apiVersion': input_data.meta.apiVersion, 
-                  'beaconId': "undefined beacon ID", 
-                  'returnedGranularity': "record"},
+            meta={
+                'apiVersion': input_data.meta.apiVersion, 
+                'beaconId': "undefined beacon ID", 
+                'returnedGranularity': "record"
+                },
+            response= {
+                    'resultSets': [{
+                        'id': "result_" + milisec(),
+                        'type': "dataset",
+                        'exists': does_data_exist,
+                        'resultCount': count_result or 0
+                    }]
+                },
             responseSummary={
                 'numTotalResults': count_result or 0,
                 'exists': does_data_exist})
+        
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 

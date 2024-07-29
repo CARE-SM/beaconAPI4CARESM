@@ -1,17 +1,17 @@
 
 {
     "meta": {
-        "apiVersion": "v2.0",
+        "apiVersion": "v4.0",
         "returnedSchemas": []
     },
     "query": {
         "filters": [
               {
-                "id": "ordo:Orphanet_93552"
+                "id": "ordo:Orphanet_79282"
               },
               {
                 "type": "obo:NCIT_C156420",
-                "id": "29",
+                "id": "15",
                 "operator": ">"
               }
       ]

@@ -1,7 +1,7 @@
 
 {
     "meta": {
-        "apiVersion": "v2.0",
+        "apiVersion": "v4.0",
         "returnedSchemas": []
     },
     "query": {

@@ -4,7 +4,8 @@ GRAPH ?{{cde}}g {
         ?{{cde}}output a sio:SIO_000015, ?{{cde}}output_type; sio:SIO_000628 ?{{cde}}attribute.
         ?{{cde}}attribute a sio:SIO_000614, ?{{cde}}attribute_type. 
         ?{{cde}}target a sio:SIO_000015, ?{{cde}}target_type.
-        FILTER(?{{cde}}process_type != sio:SIO_000006) .
+        OPTIONAL(?{{cde}}output sio:SIO_000300 ?{{cde}}value) .
+        FILTER(?{{cde}}process_type = {{process}}) .
         FILTER(?{{cde}}target_type {{{operator_target}}} {{target}}).
         FILTER(?{{cde}}attribute_type {{{operator_attribute}}} {{attribute}} ) .
         FILTER(?{{cde}}output_type {{{operator_output}}} {{output}} ) .

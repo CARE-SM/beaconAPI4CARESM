@@ -8,21 +8,21 @@ class QueryBuilder:
 
     TRIPLE_STORE_CONECTION = triplestoreConection.TripleStoreConection()
     
-    # FILTER_SEX= "True"
-    # FILTER_DISEASE= "True"
-    # FILTER_SYMPTOM= "True"
-    # FILTER_GENE_VARIANT= "True"
-    # FILTER_BIRTHYEAR= "True"
-    # FILTER_AGE_SYMPTOM_ONSET= "True"
-    # FILTER_AGE_DIAGNOSIS= "True"
+    FILTER_SEX= "True"
+    FILTER_DISEASE= "True"
+    FILTER_SYMPTOM= "True"
+    FILTER_GENE_VARIANT= "True"
+    FILTER_BIRTHYEAR= "True"
+    FILTER_AGE_SYMPTOM_ONSET= "True"
+    FILTER_AGE_DIAGNOSIS= "True"
         
-    FILTER_SEX = os.getenv("FILTER_SEX")
-    FILTER_DISEASE = os.getenv("FILTER_DISEASE")
-    FILTER_SYMPTOM = os.getenv("FILTER_SYMPTOM")
-    FILTER_GENE_VARIANT = os.getenv("FILTER_GENE_VARIANT")
-    FILTER_BIRTHYEAR = os.getenv("FILTER_BIRTHYEAR")
-    FILTER_AGE_SYMPTOM_ONSET = os.getenv("FILTER_AGE_SYMPTOM_ONSET")
-    FILTER_AGE_DIAGNOSIS = os.getenv("FILTER_AGE_DIAGNOSIS")
+    # FILTER_SEX = os.getenv("FILTER_SEX")
+    # FILTER_DISEASE = os.getenv("FILTER_DISEASE")
+    # FILTER_SYMPTOM = os.getenv("FILTER_SYMPTOM")
+    # FILTER_GENE_VARIANT = os.getenv("FILTER_GENE_VARIANT")
+    # FILTER_BIRTHYEAR = os.getenv("FILTER_BIRTHYEAR")
+    # FILTER_AGE_SYMPTOM_ONSET = os.getenv("FILTER_AGE_SYMPTOM_ONSET")
+    # FILTER_AGE_DIAGNOSIS = os.getenv("FILTER_AGE_DIAGNOSIS")
     
     def filtering_CURIE(self):
         permitted_terms = []
@@ -171,6 +171,12 @@ class QueryBuilder:
             curated_values += value + " "
         return curated_values
     
+    def curate_values4genes(self, values):
+        curated_values = ""
+        for value in values:
+            curated_values += str(value) + " "
+        return curated_values
+    
     def individuals_query_builder(self, input_data):
 
         with open('templates/block1_SELECT.mustache', 'r') as f:
@@ -195,6 +201,7 @@ class QueryBuilder:
                         if self.FILTER_SEX == "True":
                             with open('templates/block2_GENERAL.mustache', 'r') as f:
                                 Block = chevron.render(f, {
+                                    'process': "sio:SIO_000006",
                                     'operator_target': "=",
                                     'target': "sio:SIO_000015",
                                     'operator_attribute': parameter.operator,
@@ -217,6 +224,7 @@ class QueryBuilder:
                             if isinstance(parameter.id, str):
                                 with open('templates/block2_GENERAL.mustache', 'r') as f:
                                     Block = chevron.render(f, {
+                                        'process': "sio:SIO_000006",
                                         'operator_target': "=",
                                         'target': "sio:SIO_000015",
                                         'operator_attribute': parameter.operator,
@@ -231,6 +239,7 @@ class QueryBuilder:
 
                                 with open('templates/block2_GENERAL.mustache', 'r') as f:
                                     Block = chevron.render(f, {
+                                        'process': "sio:SIO_000006",
                                         'operator_target': "=",
                                         'target': "sio:SIO_000015",
                                         'operator_attribute': "!=",
@@ -262,6 +271,7 @@ class QueryBuilder:
                             if isinstance(parameter.id, str):
                                 with open('templates/block2_GENERAL.mustache', 'r') as f:
                                     Block = chevron.render(f, {
+                                        'process': "sio:SIO_000006",
                                         'operator_target': "=",
                                         'target': "sio:SIO_000015",
                                         'operator_attribute': parameter.operator,
@@ -276,6 +286,7 @@ class QueryBuilder:
 
                                 with open('templates/block2_GENERAL.mustache', 'r') as f:
                                     Block = chevron.render(f, {
+                                        'process': "sio:SIO_000006",
                                         'operator_target': "=",
                                         'target': "sio:SIO_000015",
                                         'operator_attribute': "!=",
@@ -306,49 +317,61 @@ class QueryBuilder:
                             if isinstance(parameter.id, str):
                                 with open('templates/block2_GENERAL.mustache', 'r') as f:
                                     Block = chevron.render(f, {
+                                        'process': "obo:NCIT_C15709",
                                         'operator_target': "=",
-                                        'target': "obo:NCIT_C45766",
-                                        'operator_attribute': "!=",
-                                        'attribute': "obo:NCIT_C181350",
+                                        'target': "sio:SIO_000015",
+                                        'operator_attribute': "=",
+                                        'attribute': "sio:SIO_000614",
                                         'operator_output': "=",
                                         'output': "sio:SIO_000015",
                                         'cde':stamp})
                                 queryText = queryText + Block
-                                    
-                                with open('templates/block3a_TARGET_ID.mustache', 'r') as f:
-                                    Block = chevron.render(f, {'value': parameter.id, 'cde':stamp})
+                                
+                                with open('templates/block4_VALUES.mustache', 'r') as f:
+                                    Block = chevron.render(f, {
+                                        'instance': "value",
+                                        'values': parameter.id,
+                                        'cde':stamp})                                       
+                                queryText = queryText + Block 
+                                
+                                with open('templates/block5_CONTEXT.mustache', 'r') as f:
+                                    Block = chevron.render(f, {'cde':stamp})
                                 queryText = queryText + Block
-                                                                    
+                                
                             elif isinstance(parameter.id, list):
+                                curated_values = self.curate_values4genes(parameter.id)
+
                                 with open('templates/block2_GENERAL.mustache', 'r') as f:
                                     Block = chevron.render(f, {
+                                        'process': "obo:NCIT_C15709",
                                         'operator_target': "=",
-                                        'target': "obo:NCIT_C45766",
-                                        'operator_attribute': "!=",
-                                        'attribute': "obo:NCIT_C181350",
+                                        'target': "sio:SIO_000015",
+                                        'operator_attribute': "=",
+                                        'attribute': "sio:SIO_000614",
                                         'operator_output': "=",
                                         'output': "sio:SIO_000015",
                                         'cde':stamp})                                                                        
                                 queryText = queryText + Block
-                                     
+                                
                                 with open('templates/block4_VALUES.mustache', 'r') as f:
                                     Block = chevron.render(f, {
-                                        'instance': "target_id",
+                                        'instance': "attribute_type",
                                         'values': curated_values,
                                         'cde':stamp})                                       
-                                queryText = queryText + Block 
+                                queryText = queryText + Block     
                                 
                             with open('templates/block5_CONTEXT.mustache', 'r') as f:
                                 Block = chevron.render(f, {'cde':stamp})
                             queryText = queryText + Block
                         else:
                             sys.exit( "You have used unpermitted filter for this repository, filter for GENETIC VARIANT is not available")
-                        
+
                     # BIRTHYEAR FILTER
                     elif parameter.type == "obo:NCIT_C83164" or parameter.type == "http://purl.obolibrary.org/obo/NCIT_C83164":
                         if self.FILTER_BIRTHYEAR == "True":
                             with open('templates/block2_GENERAL.mustache', 'r') as f:
                                 Block = chevron.render(f, {
+                                            'process': "sio:SIO_000006",
                                             'operator_target': "=",
                                             'target': "sio:SIO_000015",
                                             'operator_attribute': "=",
@@ -358,8 +381,7 @@ class QueryBuilder:
                                             'cde':"birthyear"})                                                                        
                             queryText = queryText + Block
                             with open('templates/block3b_OUTPUT_VALUE.mustache', 'r') as f:
-                                # startage, endage = AgeCalculation.calculateAgeRange(parameter.id, parameter.operator)
-                                Block = chevron.render(f, {'value': parameter.id, 'operator': parameter.operator, 'cde':"birthyear"})
+                                Block = chevron.render(f, {'value': parameter.id, 'operator': parameter.operator, 'datatype':"xsd:integer", 'cde':"birthyear"})
                             queryText = queryText + Block
                             with open('templates/block5_CONTEXT.mustache', 'r') as f:
                                 Block = chevron.render(f, {'cde':"birthyear"})
@@ -378,6 +400,7 @@ class QueryBuilder:
                             queryText = queryText + Block
                             with open('templates/block2_GENERAL.mustache', 'r') as f:
                                 Block = chevron.render(f, {
+                                            'process': "sio:SIO_000006",
                                             'operator_target': "=",
                                             'target': "sio:SIO_000015",
                                             'operator_attribute': "=",
@@ -395,6 +418,7 @@ class QueryBuilder:
                             
                             with open('templates/block2_GENERAL.mustache', 'r') as f:
                                 Block = chevron.render(f, {
+                                            'process': "sio:SIO_000006",
                                             'operator_target': "=",
                                             'target': "sio:SIO_000015",
                                             'operator_attribute': "=",
@@ -429,6 +453,7 @@ class QueryBuilder:
                             queryText = queryText + Block
                             with open('templates/block2_GENERAL.mustache', 'r') as f:
                                 Block = chevron.render(f, {
+                                            'process': "sio:SIO_000006",
                                             'operator_target': "=",
                                             'target': "sio:SIO_000015",
                                             'operator_attribute': "=",
@@ -446,6 +471,7 @@ class QueryBuilder:
                                                         
                             with open('templates/block2_GENERAL.mustache', 'r') as f:
                                 Block = chevron.render(f, {
+                                            'process': "sio:SIO_000006",
                                             'operator_target': "=",
                                             'target': "sio:SIO_000015",
                                             'operator_attribute': "=",
@@ -478,6 +504,7 @@ class QueryBuilder:
                             if isinstance(parameter.id, str):
                                 with open('templates/block2_GENERAL.mustache', 'r') as f:
                                     Block = chevron.render(f, {
+                                        'process': "sio:SIO_000006",
                                         'operator_target': "=",
                                         'target': "sio:SIO_000015",
                                         'operator_attribute': "=",
@@ -492,6 +519,7 @@ class QueryBuilder:
 
                                 with open('templates/block2_GENERAL.mustache', 'r') as f:
                                     Block = chevron.render(f, {
+                                        'process': "sio:SIO_000006",
                                         'operator_target': "=",
                                         'target': "sio:SIO_000015",
                                         'operator_attribute': "!=",
@@ -532,6 +560,7 @@ class QueryBuilder:
                     queryText = queryText + Block
                     with open('templates/block2_GENERAL.mustache', 'r') as f:
                         Block = chevron.render(f, {
+                                    'process': "sio:SIO_000006",
                                     'operator_target': "=",
                                     'target': "sio:SIO_000015",
                                     'operator_attribute': "=",
@@ -550,6 +579,7 @@ class QueryBuilder:
                     if isinstance(symp_info.id, str):
                         with open('templates/block2_GENERAL.mustache', 'r') as f:                    
                             Block = chevron.render(f, {
+                                'process': "sio:SIO_000006",
                                 'operator_target': symp_info.operator,
                                 'target': symp_info.id,
                                 'operator_attribute': "=",
@@ -565,6 +595,7 @@ class QueryBuilder:
 
                         with open('templates/block2_GENERAL.mustache', 'r') as f:                    
                             Block = chevron.render(f, {
+                                'process': "sio:SIO_000006",
                                 'operator_target': "!=",
                                 'target': "sio:SIO_000015",
                                 'operator_attribute': "=",
@@ -602,12 +633,12 @@ class QueryBuilder:
         else:
             sys.exit("Any of the parameters you passed is not corrected, please check you input JSON request body")
             
-        # stamp_file = "file" + milisec() + ".ttl"
-        # f = open(stamp_file, "a")
-        # f.write(queryText)
-        # f.close()
+        stamp_file = "file" + milisec() + ".ttl"
+        f = open(stamp_file, "a")
+        f.write(queryText)
+        f.close()
         
-        # print(queryText)
+        print(queryText)
         
         result = self.TRIPLE_STORE_CONECTION.get_count_individuals(queryText)
         count = result["results"]["bindings"][0]["count"]["value"]

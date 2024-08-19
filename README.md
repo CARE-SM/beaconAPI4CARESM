@@ -225,7 +225,7 @@ You can run the docker image in a `docker-compose` file that contains your envir
 version: '3'
 services:
   api:
-    image: pabloalarconm/beacon-api4care-sm:0.2.3
+    image: pabloalarconm/beacon-api4care-sm:4.0.0
     ports:
       - "8000:8000"
     environment:

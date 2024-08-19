@@ -8,7 +8,7 @@
       "filters": [
         {
           "type": "edam:data_2295",
-          "id": "https://www.ncbi.nlm.nih.gov/nuccore/NM_001128164.2",
+          "id": ["NM_001128164.2"],
           "operator": "="
       }   
     ]

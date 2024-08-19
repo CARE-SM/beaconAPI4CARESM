@@ -8,21 +8,21 @@ class QueryBuilder:
 
     TRIPLE_STORE_CONECTION = triplestoreConection.TripleStoreConection()
     
-    FILTER_SEX= "True"
-    FILTER_DISEASE= "True"
-    FILTER_SYMPTOM= "True"
-    FILTER_GENE_VARIANT= "True"
-    FILTER_BIRTHYEAR= "True"
-    FILTER_AGE_SYMPTOM_ONSET= "True"
-    FILTER_AGE_DIAGNOSIS= "True"
+    # FILTER_SEX= "True"
+    # FILTER_DISEASE= "True"
+    # FILTER_SYMPTOM= "True"
+    # FILTER_GENE_VARIANT= "True"
+    # FILTER_BIRTHYEAR= "True"
+    # FILTER_AGE_SYMPTOM_ONSET= "True"
+    # FILTER_AGE_DIAGNOSIS= "True"
         
-    # FILTER_SEX = os.getenv("FILTER_SEX")
-    # FILTER_DISEASE = os.getenv("FILTER_DISEASE")
-    # FILTER_SYMPTOM = os.getenv("FILTER_SYMPTOM")
-    # FILTER_GENE_VARIANT = os.getenv("FILTER_GENE_VARIANT")
-    # FILTER_BIRTHYEAR = os.getenv("FILTER_BIRTHYEAR")
-    # FILTER_AGE_SYMPTOM_ONSET = os.getenv("FILTER_AGE_SYMPTOM_ONSET")
-    # FILTER_AGE_DIAGNOSIS = os.getenv("FILTER_AGE_DIAGNOSIS")
+    FILTER_SEX = os.getenv("FILTER_SEX")
+    FILTER_DISEASE = os.getenv("FILTER_DISEASE")
+    FILTER_SYMPTOM = os.getenv("FILTER_SYMPTOM")
+    FILTER_GENE_VARIANT = os.getenv("FILTER_GENE_VARIANT")
+    FILTER_BIRTHYEAR = os.getenv("FILTER_BIRTHYEAR")
+    FILTER_AGE_SYMPTOM_ONSET = os.getenv("FILTER_AGE_SYMPTOM_ONSET")
+    FILTER_AGE_DIAGNOSIS = os.getenv("FILTER_AGE_DIAGNOSIS")
     
     def filtering_CURIE(self):
         permitted_terms = []
@@ -165,17 +165,24 @@ class QueryBuilder:
         except ValueError:
             sys.exit("You can't add non numerical nor fractional years to the filters related to Age, like AGE OF SYMPTOM ONSET and AGE OF DIAGNOSIS")
     
-    def curate_values(self, values):
-        curated_values = ""
-        for value in values:
-            curated_values += value + " "
-        return curated_values
-    
-    def curate_values4genes(self, values):
-        curated_values = ""
-        for value in values:
-            curated_values += str(value) + " "
-        return curated_values
+    def curate_values(self, values, tag):
+        
+        if tag == "ont":            
+            if isinstance(values, str):
+                curated_values = values
+                
+            elif isinstance(values, list):
+                curated_values = [f"{value} " for value in values]
+            
+        elif tag == "lit":
+            if isinstance(values, str):
+                curated_values = [f"'{values}'"]
+                
+            elif isinstance(values, list):
+                curated_values = [f"'{value}'" for value in values]
+        else:
+            sys.exit("No tag assigned.")
+        return " ".join(curated_values)
     
     def individuals_query_builder(self, input_data):
 
@@ -235,7 +242,7 @@ class QueryBuilder:
                                 queryText = queryText + Block
 
                             elif isinstance(parameter.id, list):
-                                curated_values = self.curate_values(parameter.id)
+                                curated_values = self.curate_values(parameter.id, tag="ont")
 
                                 with open('templates/block2_GENERAL.mustache', 'r') as f:
                                     Block = chevron.render(f, {
@@ -282,7 +289,7 @@ class QueryBuilder:
                                 queryText = queryText + Block
                                                                        
                             elif isinstance(parameter.id, list):
-                                curated_values = self.curate_values(parameter.id)
+                                curated_values = self.curate_values(parameter.id, tag="ont")
 
                                 with open('templates/block2_GENERAL.mustache', 'r') as f:
                                     Block = chevron.render(f, {
@@ -315,6 +322,15 @@ class QueryBuilder:
                             stamp = "genotype" + milisec()
                             
                             if isinstance(parameter.id, str):
+                                curated_values = self.curate_values(parameter.id, tag="lit")
+
+                                with open('templates/block4_VALUES.mustache', 'r') as f:
+                                    Block = chevron.render(f, {
+                                        'instance': "value",
+                                        'values': curated_values,
+                                        'cde':stamp})                                       
+                                queryText = queryText + Block 
+
                                 with open('templates/block2_GENERAL.mustache', 'r') as f:
                                     Block = chevron.render(f, {
                                         'process': "obo:NCIT_C15709",
@@ -327,19 +343,23 @@ class QueryBuilder:
                                         'cde':stamp})
                                 queryText = queryText + Block
                                 
-                                with open('templates/block4_VALUES.mustache', 'r') as f:
-                                    Block = chevron.render(f, {
-                                        'instance': "value",
-                                        'values': parameter.id,
-                                        'cde':stamp})                                       
-                                queryText = queryText + Block 
+                                with open('templates/block2b_OUTPUT.mustache', 'r') as f:
+                                    Block = chevron.render(f, {'cde':stamp})
+                                queryText = queryText + Block
                                 
                                 with open('templates/block5_CONTEXT.mustache', 'r') as f:
                                     Block = chevron.render(f, {'cde':stamp})
                                 queryText = queryText + Block
                                 
                             elif isinstance(parameter.id, list):
-                                curated_values = self.curate_values4genes(parameter.id)
+                                curated_values = self.curate_values(parameter.id, tag="lit")
+                                
+                                with open('templates/block4_VALUES.mustache', 'r') as f:
+                                    Block = chevron.render(f, {
+                                        'instance': "attribute_type",
+                                        'values': curated_values,
+                                        'cde':stamp})                                       
+                                queryText = queryText + Block
 
                                 with open('templates/block2_GENERAL.mustache', 'r') as f:
                                     Block = chevron.render(f, {
@@ -351,18 +371,15 @@ class QueryBuilder:
                                         'operator_output': "=",
                                         'output': "sio:SIO_000015",
                                         'cde':stamp})                                                                        
+                                queryText = queryText + Block 
+                                
+                                with open('templates/block2b_OUTPUT.mustache', 'r') as f:
+                                    Block = chevron.render(f, {'cde':stamp})
                                 queryText = queryText + Block
                                 
-                                with open('templates/block4_VALUES.mustache', 'r') as f:
-                                    Block = chevron.render(f, {
-                                        'instance': "attribute_type",
-                                        'values': curated_values,
-                                        'cde':stamp})                                       
-                                queryText = queryText + Block     
-                                
-                            with open('templates/block5_CONTEXT.mustache', 'r') as f:
-                                Block = chevron.render(f, {'cde':stamp})
-                            queryText = queryText + Block
+                                with open('templates/block5_CONTEXT.mustache', 'r') as f:
+                                    Block = chevron.render(f, {'cde':stamp})
+                                queryText = queryText + Block
                         else:
                             sys.exit( "You have used unpermitted filter for this repository, filter for GENETIC VARIANT is not available")
 
@@ -515,7 +532,7 @@ class QueryBuilder:
                                 queryText = queryText + Block
                                    
                             elif isinstance(parameter.id, list):
-                                curated_values = self.curate_values(parameter.id)
+                                curated_values = self.curate_values(parameter.id, tag="ont")
 
                                 with open('templates/block2_GENERAL.mustache', 'r') as f:
                                     Block = chevron.render(f, {
@@ -633,12 +650,12 @@ class QueryBuilder:
         else:
             sys.exit("Any of the parameters you passed is not corrected, please check you input JSON request body")
             
-        stamp_file = "file" + milisec() + ".ttl"
-        f = open(stamp_file, "a")
-        f.write(queryText)
-        f.close()
+        # stamp_file = "file" + milisec() + ".ttl"
+        # f = open(stamp_file, "a")
+        # f.write(queryText)
+        # f.close()
         
-        print(queryText)
+        # print(queryText)
         
         result = self.TRIPLE_STORE_CONECTION.get_count_individuals(queryText)
         count = result["results"]["bindings"][0]["count"]["value"]

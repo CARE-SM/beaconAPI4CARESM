@@ -11,9 +11,9 @@ class TripleStoreConection:
             TRIPLESTORE_USERNAME = os.environ['TRIPLESTORE_USERNAME']
             TRIPLESTORE_PASSWORD = os.environ['TRIPLESTORE_PASSWORD']
             
-            TRIPLESTORE_URL="https://graphdb.ejprd.semlab-leiden.nl/repositories/unifiedCDE_model" #_no_context
-            TRIPLESTORE_USERNAME="pabloa"
-            TRIPLESTORE_PASSWORD="ejprdejprd"
+            # TRIPLESTORE_URL="https://graphdb.ejprd.semlab-leiden.nl/repositories/..."
+            # TRIPLESTORE_USERNAME=""
+            # TRIPLESTORE_PASSWORD=""
 
             ENDPOINT = SPARQLWrapper(TRIPLESTORE_URL)
             ENDPOINT.setHTTPAuth(BASIC)

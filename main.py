@@ -11,23 +11,23 @@ from models.curie import CURIEFiltering
 
 from querySelection import QueryBuilder
 
-URL_SERVER="http://127.0.0.1:8000/"
-# URL_SERVER = os.getenv("URL_SERVER")
+# URL_SERVER="http://0.0.0.0:8000/"
+URL_SERVER = os.getenv("URL_SERVER")
 
 app = FastAPI(
     title="Beacon-API for CARE-SM", version="0.0.8", openapi_url="/openapi.json", openapi_route="/openapi.json") 
 
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=["*"],
-    allow_methods=["*"],
-    allow_headers=["*"],
-)
-
+# app.add_middleware(
+#     CORSMiddleware,
+#     allow_origins=["*"],  # Allow all origins, but you can specify a list of allowed origins
+#     allow_credentials=True,
+#     allow_methods=["*"],  # Allow all HTTP methods
+#     allow_headers=["*"],  # Allow all headers
+# )
 service = QueryBuilder()
 
 def custom_openapi():
-    openapi_schema = get_openapi(title="Beacon-API for CARE-SM ", version="0.0.8", routes=app.routes)
+    openapi_schema = get_openapi(title="Beacon-API for CARE-SM ", version="4.0.0", routes=app.routes)
     openapi_schema["servers"] = [{"url": URL_SERVER}]
     return openapi_schema
 

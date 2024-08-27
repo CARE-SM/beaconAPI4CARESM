@@ -12,10 +12,12 @@ from models.curie import CURIEFiltering
 from querySelection import QueryBuilder
 
 # URL_SERVER="http://0.0.0.0:8000/"
+# proxy_path="somepath"
 URL_SERVER = os.getenv("URL_SERVER")
+proxy_path =os.getenv("PROXY_PATH")
 
 app = FastAPI(
-    title="Beacon-API for CARE-SM", version="0.0.8", openapi_url="/openapi.json", openapi_route="/openapi.json") 
+    title="Beacon-API for CARE-SM", version="4.0.1", openapi_url="/openapi.json", openapi_route="/openapi.json") 
 
 # app.add_middleware(
 #     CORSMiddleware,
@@ -60,7 +62,7 @@ async def individuals_counts(input_data: IndividualRequest):
     try:
         count_result = service.individuals_query_builder(input_data=input_data)
         does_data_exist = count_result is not None
-        return IndividualResponse(
+        output_data=IndividualResponse(
             meta={
                 'apiVersion': input_data.meta.apiVersion, 
                 'beaconId': "undefined beacon ID", 
@@ -77,6 +79,34 @@ async def individuals_counts(input_data: IndividualRequest):
             responseSummary={
                 'numTotalResults': count_result or 0,
                 'exists': does_data_exist})
+        return output_data
+        
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+    
+@app.post(f"/{proxy_path}/individuals/")
+async def individuals_counts(input_data: IndividualRequest):
+    try:
+        count_result = service.individuals_query_builder(input_data=input_data)
+        does_data_exist = count_result is not None
+        output_data = IndividualResponse(
+            meta={
+                'apiVersion': input_data.meta.apiVersion, 
+                'beaconId': "undefined beacon ID", 
+                'returnedGranularity': "record"
+                },
+            response= {
+                    'resultSets': [{
+                        'id': "result_" + milisec(),
+                        'type': "dataset",
+                        'exists': does_data_exist,
+                        'resultCount': count_result or 0
+                    }]
+                },
+            responseSummary={
+                'numTotalResults': count_result or 0,
+                'exists': does_data_exist})
+        return output_data
         
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))

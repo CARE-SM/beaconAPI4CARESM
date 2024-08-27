@@ -654,9 +654,7 @@ class QueryBuilder:
         # f = open(stamp_file, "a")
         # f.write(queryText)
         # f.close()
-        
-        # print(queryText)
-        
+                
         result = self.TRIPLE_STORE_CONECTION.get_count_individuals(queryText)
         count = result["results"]["bindings"][0]["count"]["value"]
         return count

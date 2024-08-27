@@ -11,7 +11,7 @@ class TripleStoreConection:
             TRIPLESTORE_USERNAME = os.environ['TRIPLESTORE_USERNAME']
             TRIPLESTORE_PASSWORD = os.environ['TRIPLESTORE_PASSWORD']
             
-            # TRIPLESTORE_URL="https://graphdb.ejprd.semlab-leiden.nl/repositories/..."
+            # TRIPLESTORE_URL="https://graphdb.ejprd.semlab-leiden.nl/repositories/unifiedCDE_model"
             # TRIPLESTORE_USERNAME=""
             # TRIPLESTORE_PASSWORD=""
 

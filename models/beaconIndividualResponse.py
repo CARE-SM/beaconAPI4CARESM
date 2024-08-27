@@ -25,3 +25,28 @@ class IndividualResponse(BaseModel):
     meta: IndividualsMetaResponseContent
     response: IndividualsResults
     responseSummary: IndividualResponseContent
+    
+    class Config:
+        json_schema_extra = {
+            "example": {
+                "meta": {
+                    "apiVersion": "v4.0",
+                    "beaconId": "undefined beacon ID",
+                    "returnedGranularity": "record"
+                },
+                "response": {
+                    "resultSets": [
+                    {
+                        "id": "result_20240820132545378295",
+                        "type": "dataset",
+                        "exists": True,
+                        "resultCount": 5
+                    }
+                    ]
+                },
+                "responseSummary": {
+                    "exists": True,
+                    "numTotalResults": 5
+                }
+                }
+        }

@@ -33,9 +33,28 @@ class ReturnedSchemas(BaseModel):
 
 class MetaContent(BaseModel):
     apiVersion: str
-    beaconID: Optional[str] = None # TODO
-    returnedSchemas: List[ReturnedSchemas] = None # TODO
+    beaconID: Optional[str] = None
+    returnedSchemas: List[ReturnedSchemas] = None
 
 class IndividualRequest(BaseModel):
     meta: MetaContent
     query: RequestQuery
+    
+    class Config:
+        json_schema_extra = {
+            "example": { 
+                "meta":{
+                    "apiVersion": "v4.0",
+                    "returnedSchemas": []
+                },
+                    "query": {
+                        "filters": [
+                        {
+                            "type": "obo:NCIT_C83164",
+                            "id": "1904",
+                            "operator": ">="
+                        }
+                        ]
+                    }
+                }
+        }

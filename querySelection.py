@@ -217,8 +217,8 @@ class QueryBuilder:
                                     'output': "obo:NCIT_C160908",
                                     'cde':"sex"})
                             queryText = queryText + Block
-                            with open('templates/block5_CONTEXT.mustache', 'r') as f:
-                                Block = chevron.render(f, {'cde':"sex"})
+                            with open('templates/block6_CLOSE.mustache', 'r') as f:
+                                Block = chevron.render(f, {})
                             queryText = queryText + Block
                         else:
                             sys.exit( "You have used unpermitted filter for this repository, filter for SEX is not available")
@@ -239,6 +239,10 @@ class QueryBuilder:
                                         'operator_output': "=",
                                         'output': "obo:NCIT_C154625",
                                         'cde':stamp})  
+                                queryText = queryText + Block
+                                
+                                with open('templates/block6_CLOSE.mustache', 'r') as f:
+                                    Block = chevron.render(f, {})
                                 queryText = queryText + Block
 
                             elif isinstance(parameter.id, list):
@@ -263,10 +267,10 @@ class QueryBuilder:
                                         'cde':stamp})                                       
                                 queryText = queryText + Block
                                 
-                            with open('templates/block5_CONTEXT.mustache', 'r') as f:
-                                Block = chevron.render(f, {'cde':stamp})
-                            queryText = queryText + Block
-                            
+                                with open('templates/block6_CLOSE.mustache', 'r') as f:
+                                    Block = chevron.render(f, {})
+                                queryText = queryText + Block
+                                
                         else:
                             sys.exit( "You have used unpermitted filter for this repository, filter for DISEASE is not available")
 
@@ -286,6 +290,10 @@ class QueryBuilder:
                                         'operator_output': "=",
                                         'output': "sio:SIO_000015",
                                         'cde':stamp}) 
+                                queryText = queryText + Block
+                                
+                                with open('templates/block6_CLOSE.mustache', 'r') as f:
+                                    Block = chevron.render(f, {})
                                 queryText = queryText + Block
                                                                        
                             elif isinstance(parameter.id, list):
@@ -308,11 +316,12 @@ class QueryBuilder:
                                         'instance': "attribute_type",
                                         'values': curated_values,
                                         'cde':stamp})                                       
-                                queryText = queryText + Block      
+                                queryText = queryText + Block  
                                     
-                            with open('templates/block5_CONTEXT.mustache', 'r') as f:
-                                Block = chevron.render(f, {'cde':stamp})
-                            queryText = queryText + Block
+                                with open('templates/block6_CLOSE.mustache', 'r') as f:
+                                    Block = chevron.render(f, {})
+                                queryText = queryText + Block
+
                         else:
                             sys.exit( "You have used unpermitted filter for this repository, filter for SYMPTOM/PHENOTYPE is not available")
                         
@@ -321,7 +330,7 @@ class QueryBuilder:
                         if self.FILTER_GENE_VARIANT == "True":
                             stamp = "genotype" + milisec()
                             
-                            if isinstance(parameter.id, str):
+                            if isinstance(parameter.id, str) or isinstance(parameter.id, list):
                                 curated_values = self.curate_values(parameter.id, tag="lit")
 
                                 with open('templates/block4_VALUES.mustache', 'r') as f:
@@ -343,43 +352,14 @@ class QueryBuilder:
                                         'cde':stamp})
                                 queryText = queryText + Block
                                 
-                                with open('templates/block2b_OUTPUT.mustache', 'r') as f:
-                                    Block = chevron.render(f, {'cde':stamp})
+                                with open('templates/block3a_OUTPUT.mustache', 'r') as f:
+                                    Block = chevron.render(f, {'cde':stamp, 'instance':"output_identifier"})
                                 queryText = queryText + Block
                                 
-                                with open('templates/block5_CONTEXT.mustache', 'r') as f:
-                                    Block = chevron.render(f, {'cde':stamp})
+                                with open('templates/block6_CLOSE.mustache', 'r') as f:
+                                    Block = chevron.render(f, {})
                                 queryText = queryText + Block
-                                
-                            elif isinstance(parameter.id, list):
-                                curated_values = self.curate_values(parameter.id, tag="lit")
-                                
-                                with open('templates/block4_VALUES.mustache', 'r') as f:
-                                    Block = chevron.render(f, {
-                                        'instance': "attribute_type",
-                                        'values': curated_values,
-                                        'cde':stamp})                                       
-                                queryText = queryText + Block
-
-                                with open('templates/block2_GENERAL.mustache', 'r') as f:
-                                    Block = chevron.render(f, {
-                                        'process': "obo:NCIT_C15709",
-                                        'operator_target': "=",
-                                        'target': "sio:SIO_000015",
-                                        'operator_attribute': "=",
-                                        'attribute': "sio:SIO_000614",
-                                        'operator_output': "=",
-                                        'output': "sio:SIO_000015",
-                                        'cde':stamp})                                                                        
-                                queryText = queryText + Block 
-                                
-                                with open('templates/block2b_OUTPUT.mustache', 'r') as f:
-                                    Block = chevron.render(f, {'cde':stamp})
-                                queryText = queryText + Block
-                                
-                                with open('templates/block5_CONTEXT.mustache', 'r') as f:
-                                    Block = chevron.render(f, {'cde':stamp})
-                                queryText = queryText + Block
+                            
                         else:
                             sys.exit( "You have used unpermitted filter for this repository, filter for GENETIC VARIANT is not available")
 
@@ -397,11 +377,17 @@ class QueryBuilder:
                                             'output': "sio:SIO_000015",
                                             'cde':"birthyear"})                                                                        
                             queryText = queryText + Block
-                            with open('templates/block3b_OUTPUT_VALUE.mustache', 'r') as f:
+                            
+                            with open('templates/block3a_OUTPUT.mustache', 'r') as f:
+                                Block = chevron.render(f, {'cde':"birthyear", 'instance':"output"})
+                            queryText = queryText + Block                         
+                            
+                            with open('templates/block3b_FILTER.mustache', 'r') as f:
                                 Block = chevron.render(f, {'value': parameter.id, 'operator': parameter.operator, 'datatype':"xsd:integer", 'cde':"birthyear"})
                             queryText = queryText + Block
-                            with open('templates/block5_CONTEXT.mustache', 'r') as f:
-                                Block = chevron.render(f, {'cde':"birthyear"})
+                            
+                            with open('templates/block6_CLOSE.mustache', 'r') as f:
+                                Block = chevron.render(f, {})
                             queryText = queryText + Block
                         else:
                             sys.exit( "You have used unpermitted filter for this repository, filter for BIRTHYEAR is not available")
@@ -429,9 +415,6 @@ class QueryBuilder:
                             with open('templates/block5_CONTEXT.mustache', 'r') as f:
                                 Block = chevron.render(f, {'cde':"s_birthdate"})
                             queryText = queryText + Block
-                            with open('templates/block5b_CONTEXT_DATE.mustache', 'r') as f:
-                                Block = chevron.render(f, {'cde':"s_birthdate"})
-                            queryText = queryText + Block
                             
                             with open('templates/block2_GENERAL.mustache', 'r') as f:
                                 Block = chevron.render(f, {
@@ -445,9 +428,6 @@ class QueryBuilder:
                                             'cde':"s_onset"})  
                             queryText = queryText + Block           
                             with open('templates/block5_CONTEXT.mustache', 'r') as f:
-                                Block = chevron.render(f, {'cde':"s_onset"})
-                            queryText = queryText + Block
-                            with open('templates/block5b_CONTEXT_DATE.mustache', 'r') as f:
                                 Block = chevron.render(f, {'cde':"s_onset"})
                             queryText = queryText + Block
                             with open('templates/block6_CLOSE.mustache', 'r') as f:
@@ -482,9 +462,6 @@ class QueryBuilder:
                             with open('templates/block5_CONTEXT.mustache', 'r') as f:
                                 Block = chevron.render(f, {'cde':"d_birthdate"})
                             queryText = queryText + Block
-                            with open('templates/block5b_CONTEXT_DATE.mustache', 'r') as f:
-                                Block = chevron.render(f, {'cde':"d_birthdate"})
-                            queryText = queryText + Block
                                                         
                             with open('templates/block2_GENERAL.mustache', 'r') as f:
                                 Block = chevron.render(f, {
@@ -498,9 +475,6 @@ class QueryBuilder:
                                             'cde':"d_onset"})  
                             queryText = queryText + Block
                             with open('templates/block5_CONTEXT.mustache', 'r') as f:
-                                Block = chevron.render(f, {'cde':"d_onset"})
-                            queryText = queryText + Block
-                            with open('templates/block5b_CONTEXT_DATE.mustache', 'r') as f:
                                 Block = chevron.render(f, {'cde':"d_onset"})
                             queryText = queryText + Block
                             with open('templates/block6_CLOSE.mustache', 'r') as f:
@@ -530,6 +504,10 @@ class QueryBuilder:
                                         'output': "obo:NCIT_C154625",
                                         'cde':stamp})  
                                 queryText = queryText + Block
+                                
+                                with open('templates/block6_CLOSE.mustache', 'r') as f:
+                                    Block = chevron.render(f, {})
+                                queryText = queryText + Block
                                    
                             elif isinstance(parameter.id, list):
                                 curated_values = self.curate_values(parameter.id, tag="ont")
@@ -553,9 +531,10 @@ class QueryBuilder:
                                         'cde':stamp})                                       
                                 queryText = queryText + Block
                                 
-                            with open('templates/block5_CONTEXT.mustache', 'r') as f:
-                                Block = chevron.render(f, {'cde':stamp})
-                            queryText = queryText + Block
+                                with open('templates/block6_CLOSE.mustache', 'r') as f:
+                                    Block = chevron.render(f, {})
+                                queryText = queryText + Block
+                                
                     else:
                         sys.exit( "You have used unpermitted filter for this repository, filter for DISEASE is not available")   
 
@@ -589,9 +568,6 @@ class QueryBuilder:
                     with open('templates/block5_CONTEXT.mustache', 'r') as f:
                         Block = chevron.render(f, {'cde':"s_birthdate"})
                     queryText = queryText + Block
-                    with open('templates/block5b_CONTEXT_DATE.mustache', 'r') as f:
-                        Block = chevron.render(f, {'cde':"s_birthdate"})
-                    queryText = queryText + Block
 
                     if isinstance(symp_info.id, str):
                         with open('templates/block2_GENERAL.mustache', 'r') as f:                    
@@ -605,6 +581,7 @@ class QueryBuilder:
                                 'output': "sio:SIO_000015",
                                 'cde':"s_onset"})  
                         queryText = queryText + Block
+
      
                     elif isinstance(symp_info.id, list):
                         
@@ -628,11 +605,8 @@ class QueryBuilder:
                                 'values': curated_values,
                                 'cde':"s_onset"})                                       
                         queryText = queryText + Block      
-
+                        
                     with open('templates/block5_CONTEXT.mustache', 'r') as f:
-                        Block = chevron.render(f, {'cde':"s_onset"})
-                    queryText = queryText + Block
-                    with open('templates/block5b_CONTEXT_DATE.mustache', 'r') as f:
                         Block = chevron.render(f, {'cde':"s_onset"})
                     queryText = queryText + Block
                     with open('templates/block6_CLOSE.mustache', 'r') as f:

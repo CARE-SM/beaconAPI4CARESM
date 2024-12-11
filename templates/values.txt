@@ -1,0 +1,14 @@
+Sex ------ Attribute
+
+Diagnosis ---- Attribute
+
+Genotype ---- Output identifier value
+
+Phenotype ---- Attribute
+
+
+Age of symptom    Symptom onset Stardate /Target
+
+Age of Diagnosis  Diagnosis stardate
+
+Birthyear -- Birthyear

@@ -9,7 +9,8 @@
               {
                 "type": "sio:SIO_010056",
                 "id": "obo:HP_0003131",
-                "operator": "="              },
+                "operator": "="             
+              },
               {
                 "type": "obo:NCIT_C124353",
                 "id": "7",

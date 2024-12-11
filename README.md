@@ -233,6 +233,7 @@ services:
       - TRIPLESTORE_USERNAME=admin
       - TRIPLESTORE_PASSWORD=root
       - URL_SERVER=http://0.0.0.0:8000/
+      - PROXY_PATH=proxy
 
       - FILTER_SEX=True
       - FILTER_DISEASE=True

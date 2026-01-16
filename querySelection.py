@@ -1,28 +1,23 @@
 import triplestoreConection
 import chevron
-from perseo.main import milisec
 import sys
 import os
 
 class QueryBuilder:
-
-    TRIPLE_STORE_CONECTION = triplestoreConection.TripleStoreConection()
     
-    # FILTER_SEX= "True"
-    # FILTER_DISEASE= "True"
-    # FILTER_SYMPTOM= "True"
-    # FILTER_GENE_VARIANT= "True"
-    # FILTER_BIRTHYEAR= "True"
-    # FILTER_AGE_SYMPTOM_ONSET= "True"
-    # FILTER_AGE_DIAGNOSIS= "True"
-        
-    FILTER_SEX = os.getenv("FILTER_SEX")
-    FILTER_DISEASE = os.getenv("FILTER_DISEASE")
-    FILTER_SYMPTOM = os.getenv("FILTER_SYMPTOM")
-    FILTER_GENE_VARIANT = os.getenv("FILTER_GENE_VARIANT")
-    FILTER_BIRTHYEAR = os.getenv("FILTER_BIRTHYEAR")
-    FILTER_AGE_SYMPTOM_ONSET = os.getenv("FILTER_AGE_SYMPTOM_ONSET")
-    FILTER_AGE_DIAGNOSIS = os.getenv("FILTER_AGE_DIAGNOSIS")
+    TRIPLE_STORE_CONECTION = triplestoreConection.TripleStoreConnection(
+        # endpoint_url="https://graphdb.ejprd.semlab-leiden.nl/repositories/unifiedCDE_model",
+        # username="",
+        # password="",
+    )
+
+    FILTER_SEX = os.getenv("FILTER_SEX","True")
+    FILTER_DISEASE = os.getenv("FILTER_DISEASE","True")
+    FILTER_SYMPTOM = os.getenv("FILTER_SYMPTOM","True")
+    FILTER_GENE_VARIANT = os.getenv("FILTER_GENE_VARIANT","True")
+    FILTER_BIRTHYEAR = os.getenv("FILTER_BIRTHYEAR","True")
+    FILTER_AGE_SYMPTOM_ONSET = os.getenv("FILTER_AGE_SYMPTOM_ONSET","True")
+    FILTER_AGE_DIAGNOSIS = os.getenv("FILTER_AGE_DIAGNOSIS","True")
     
     def filtering_CURIE(self):
         permitted_terms = []
@@ -162,8 +157,8 @@ class QueryBuilder:
             # Try converting to integer
             int_value = int(string)
             return int_value
-        except ValueError:
-            sys.exit("You can't add non numerical nor fractional years to the filters related to Age, like AGE OF SYMPTOM ONSET and AGE OF DIAGNOSIS")
+        except ValueError():
+            sys.exit("Fractional numbers are not allowed")
     
     def curate_values(self, values, tag):
         
@@ -192,15 +187,16 @@ class QueryBuilder:
         if input_data.query.filters:
             
             list_filters_used = []
-            symp_info = {}
-            onset_info = {}
+            # symp_info = {}
+            # onset_info = {}
             
             # Store parameter.types to for later validation
             for parameter in input_data.query.filters:
                 if parameter.type:
                     list_filters_used += [parameter.type]
-           
-            for parameter in input_data.query.filters:                
+                                        
+            for i, parameter in enumerate(input_data.query.filters):
+
                 if parameter.type:
                     
                     # SEX FILTER
@@ -209,159 +205,136 @@ class QueryBuilder:
                             with open('templates/block2_GENERAL.mustache', 'r') as f:
                                 Block = chevron.render(f, {
                                     'process': "sio:SIO_000006",
-                                    'operator_target': "=",
-                                    'target': "sio:SIO_000015",
                                     'operator_attribute': parameter.operator,
                                     'attribute':parameter.id,
+                                    'instance': "output_type",
                                     'operator_output': "=",
                                     'output': "obo:NCIT_C160908",
                                     'cde':"sex"})
                             queryText = queryText + Block
-                            with open('templates/block6_CLOSE.mustache', 'r') as f:
-                                Block = chevron.render(f, {})
-                            queryText = queryText + Block
+                            queryText = queryText + "}"
                         else:
-                            sys.exit( "You have used unpermitted filter for this repository, filter for SEX is not available")
+                            sys.exit( "SEX ({parameter.type}) filter not permitted.")
 
                     # DISEASE FILTER
                     elif parameter.type == "obo:NCIT_C2991" or parameter.type == "http://purl.obolibrary.org/obo/NCIT_C2991":
-                        if self.FILTER_DISEASE == "True":
-                            stamp = "disease" + milisec()
+                        if self.FILTER_DISEASE == "True":                            
+                            stamp = f"f_disease_{i}"
 
                             if isinstance(parameter.id, str):
                                 with open('templates/block2_GENERAL.mustache', 'r') as f:
                                     Block = chevron.render(f, {
-                                        'process': "sio:SIO_000006",
-                                        'operator_target': "=",
-                                        'target': "sio:SIO_000015",
-                                        'operator_attribute': parameter.operator,
-                                        'attribute':parameter.id,
-                                        'operator_output': "=",
-                                        'output': "obo:NCIT_C154625",
+                                        'process': "obo:NCIT_C18020",
+                                        'operator_attribute': "=",
+                                        'attribute': "obo:NCIT_C7057",
+                                        'instance': "output_identifier",
+                                        'operator_output': parameter.operator,
+                                        'output': parameter.id,
                                         'cde':stamp})  
-                                queryText = queryText + Block
-                                
-                                with open('templates/block6_CLOSE.mustache', 'r') as f:
-                                    Block = chevron.render(f, {})
-                                queryText = queryText + Block
+                                queryText = queryText + Block                          
+                                queryText = queryText + "}"
 
                             elif isinstance(parameter.id, list):
                                 curated_values = self.curate_values(parameter.id, tag="ont")
 
                                 with open('templates/block2_GENERAL.mustache', 'r') as f:
                                     Block = chevron.render(f, {
-                                        'process': "sio:SIO_000006",
-                                        'operator_target': "=",
-                                        'target': "sio:SIO_000015",
-                                        'operator_attribute': "!=",
-                                        'attribute': "sio:SIO_000614",
+                                        'process': "obo:NCIT_C18020",
+                                        'operator_attribute': "=",
+                                        'attribute': "obo:NCIT_C7057",
+                                        'instance': "output_type",
                                         'operator_output': "=",
-                                        'output': "obo:NCIT_C154625",
-                                        'cde':stamp})                                       
+                                        'output': "obo:OGMS_0000073",
+                                        'cde': stamp})                                      
                                 queryText = queryText + Block
                                                                 
-                                with open('templates/block4_VALUES.mustache', 'r') as f:
+                                with open('templates/block3c_VALUES.mustache', 'r') as f:
                                     Block = chevron.render(f, {
-                                        'instance': "attribute_type",
+                                        'instance': "output_identifier",
                                         'values': curated_values,
                                         'cde':stamp})                                       
                                 queryText = queryText + Block
-                                
-                                with open('templates/block6_CLOSE.mustache', 'r') as f:
-                                    Block = chevron.render(f, {})
-                                queryText = queryText + Block
+                                queryText = queryText + "}"
                                 
                         else:
-                            sys.exit( "You have used unpermitted filter for this repository, filter for DISEASE is not available")
+                            sys.exit( "DISEASE ({parameter.type}) filter not permitted.")
 
                     # PHENOTYPE FILTER
-                    elif ("sio:SIO_010056" in list_filters_used or "http://semanticscience.org/resource/SIO_010056" in list_filters_used) and ("obo:NCIT_C124353" not in list_filters_used and "http://purl.obolibrary.org/obo/NCIT_C124353" not in list_filters_used):
+                    elif parameter.type == "sio:SIO_010056" or parameter.type == "http://semanticscience.org/resource/SIO_010056":
                         if self.FILTER_SYMPTOM == "True":
-                            stamp = "phenotype" + milisec()
+                            stamp = f"f_phenotype_{i}"
 
                             if isinstance(parameter.id, str):
                                 with open('templates/block2_GENERAL.mustache', 'r') as f:
                                     Block = chevron.render(f, {
-                                        'process': "sio:SIO_000006",
-                                        'operator_target': "=",
-                                        'target': "sio:SIO_000015",
-                                        'operator_attribute': parameter.operator,
-                                        'attribute': parameter.id,
-                                        'operator_output': "=",
-                                        'output': "sio:SIO_000015",
+                                        'process': "obo:NCIT_C18020",
+                                        'operator_attribute': "=",
+                                        'attribute': "sio:SIO_000614",
+                                        'instance': "output_identifier",
+                                        'operator_output': parameter.operator,
+                                        'output': parameter.id,
                                         'cde':stamp}) 
                                 queryText = queryText + Block
-                                
-                                with open('templates/block6_CLOSE.mustache', 'r') as f:
-                                    Block = chevron.render(f, {})
-                                queryText = queryText + Block
+                                queryText = queryText + "}"
                                                                        
                             elif isinstance(parameter.id, list):
                                 curated_values = self.curate_values(parameter.id, tag="ont")
 
                                 with open('templates/block2_GENERAL.mustache', 'r') as f:
                                     Block = chevron.render(f, {
-                                        'process': "sio:SIO_000006",
-                                        'operator_target': "=",
-                                        'target': "sio:SIO_000015",
-                                        'operator_attribute': "!=",
+                                        'process': "obo:NCIT_C18020",
+                                        'operator_attribute': "=",
                                         'attribute': "sio:SIO_000614",
+                                        'instance': "output_type",
                                         'operator_output': "=",
-                                        'output': "sio:SIO_000015",
+                                        'output': "obo:NCIT_C16977",
                                         'cde':stamp})     
                                 queryText = queryText + Block
                                     
-                                with open('templates/block4_VALUES.mustache', 'r') as f:
+                                with open('templates/block3c_VALUES.mustache', 'r') as f:
                                     Block = chevron.render(f, {
-                                        'instance': "attribute_type",
+                                        'instance': "output_identifier",
                                         'values': curated_values,
                                         'cde':stamp})                                       
                                 queryText = queryText + Block  
-                                    
-                                with open('templates/block6_CLOSE.mustache', 'r') as f:
-                                    Block = chevron.render(f, {})
-                                queryText = queryText + Block
+                                queryText = queryText + "}"
 
                         else:
-                            sys.exit( "You have used unpermitted filter for this repository, filter for SYMPTOM/PHENOTYPE is not available")
+                            sys.exit( "PHENOTYPE ({parameter.type}) filter not permitted.")
                         
                     # GENOTYPE FILTER
                     elif parameter.type == "edam:data_2295": 
                         if self.FILTER_GENE_VARIANT == "True":
-                            stamp = "genotype" + milisec()
-                            
+                            stamp = f"f_genetic_{i}"
+
                             if isinstance(parameter.id, str) or isinstance(parameter.id, list):
                                 curated_values = self.curate_values(parameter.id, tag="lit")
 
-                                with open('templates/block4_VALUES.mustache', 'r') as f:
+                                with open('templates/block2_GENERAL.mustache', 'r') as f:
+                                    Block = chevron.render(f, {
+                                        'process': "obo:NCIT_C15709",
+                                        'operator_attribute': "=",
+                                        'attribute': "sio:SIO_000614",
+                                        'instance': "output_type",
+                                        'operator_output': "=",
+                                        'output': "obo:NCIT_C171178",
+                                        'cde':stamp})
+                                queryText = queryText + Block
+                                
+                                with open('templates/block3a_HASVALUE.mustache', 'r') as f:
+                                    Block = chevron.render(f, {'cde':stamp, 'instance':"output_identifier"})
+                                queryText = queryText + Block
+                                
+                                with open('templates/block3c_VALUES.mustache', 'r') as f:
                                     Block = chevron.render(f, {
                                         'instance': "value",
                                         'values': curated_values,
                                         'cde':stamp})                                       
                                 queryText = queryText + Block 
-
-                                with open('templates/block2_GENERAL.mustache', 'r') as f:
-                                    Block = chevron.render(f, {
-                                        'process': "obo:NCIT_C15709",
-                                        'operator_target': "=",
-                                        'target': "sio:SIO_000015",
-                                        'operator_attribute': "=",
-                                        'attribute': "sio:SIO_000614",
-                                        'operator_output': "=",
-                                        'output': "sio:SIO_000015",
-                                        'cde':stamp})
-                                queryText = queryText + Block
-                                
-                                with open('templates/block3a_OUTPUT.mustache', 'r') as f:
-                                    Block = chevron.render(f, {'cde':stamp, 'instance':"output_identifier"})
-                                queryText = queryText + Block
-                                
-                                with open('templates/block6_CLOSE.mustache', 'r') as f:
-                                    Block = chevron.render(f, {})
-                                queryText = queryText + Block
+                                queryText = queryText + "}"
                             
                         else:
-                            sys.exit( "You have used unpermitted filter for this repository, filter for GENETIC VARIANT is not available")
+                            sys.exit( "GENETIC VARIANT ({parameter.type}) filter not permitted.")
 
                     # BIRTHYEAR FILTER
                     elif parameter.type == "obo:NCIT_C83164" or parameter.type == "http://purl.obolibrary.org/obo/NCIT_C83164":
@@ -369,31 +342,27 @@ class QueryBuilder:
                             with open('templates/block2_GENERAL.mustache', 'r') as f:
                                 Block = chevron.render(f, {
                                             'process': "sio:SIO_000006",
-                                            'operator_target': "=",
-                                            'target': "sio:SIO_000015",
                                             'operator_attribute': "=",
                                             'attribute': parameter.type,
+                                            'instance': "output_type",
                                             'operator_output': "=",
                                             'output': "sio:SIO_000015",
                                             'cde':"birthyear"})                                                                        
                             queryText = queryText + Block
                             
-                            with open('templates/block3a_OUTPUT.mustache', 'r') as f:
+                            with open('templates/block3a_HASVALUE.mustache', 'r') as f:
                                 Block = chevron.render(f, {'cde':"birthyear", 'instance':"output"})
                             queryText = queryText + Block                         
                             
-                            with open('templates/block3b_FILTER.mustache', 'r') as f:
+                            with open('templates/block3b_DATATYPE.mustache', 'r') as f:
                                 Block = chevron.render(f, {'value': parameter.id, 'operator': parameter.operator, 'datatype':"xsd:integer", 'cde':"birthyear"})
                             queryText = queryText + Block
-                            
-                            with open('templates/block6_CLOSE.mustache', 'r') as f:
-                                Block = chevron.render(f, {})
-                            queryText = queryText + Block
+                            queryText = queryText + "}"
                         else:
-                            sys.exit( "You have used unpermitted filter for this repository, filter for BIRTHYEAR is not available")
+                            sys.exit( "YBIRTHYEAR ({parameter.type}) filter not permitted.")
                         
                     # AGE_OF_SYMPTOM FILTER
-                    elif ("sio:SIO_010056" not in list_filters_used and "http://semanticscience.org/resource/SIO_010056" not in list_filters_used) and ("obo:NCIT_C124353" in list_filters_used or "http://purl.obolibrary.org/obo/NCIT_C124353" in list_filters_used):
+                    elif parameter.type == "sio:SIO_010056" or parameter.type == "http://semanticscience.org/resource/SIO_010056":
                         if self.FILTER_AGE_SYMPTOM_ONSET == "True":
                             
                             parameter_checked = self.detect_number_type(parameter.id)
@@ -404,40 +373,34 @@ class QueryBuilder:
                             with open('templates/block2_GENERAL.mustache', 'r') as f:
                                 Block = chevron.render(f, {
                                             'process': "sio:SIO_000006",
-                                            'operator_target': "=",
-                                            'target': "sio:SIO_000015",
                                             'operator_attribute': "=",
                                             'attribute': "obo:NCIT_C68615",
+                                            'instance': "output_type",
                                             'operator_output': "=",
                                             'output': "sio:SIO_000015",
                                             'cde':"s_birthdate"})   
                             queryText = queryText + Block
-                            with open('templates/block5_CONTEXT.mustache', 'r') as f:
+                            with open('templates/block4_STARTDATE.mustache', 'r') as f:
                                 Block = chevron.render(f, {'cde':"s_birthdate"})
                             queryText = queryText + Block
                             
                             with open('templates/block2_GENERAL.mustache', 'r') as f:
                                 Block = chevron.render(f, {
                                             'process': "sio:SIO_000006",
-                                            'operator_target': "=",
-                                            'target': "sio:SIO_000015",
                                             'operator_attribute': "=",
                                             'attribute': "obo:NCIT_C124353",
+                                            'instance': "output_type",
                                             'operator_output': "=",
                                             'output': "sio:SIO_000015",
                                             'cde':"s_onset"})  
                             queryText = queryText + Block           
-                            with open('templates/block5_CONTEXT.mustache', 'r') as f:
+                            with open('templates/block4_STARTDATE.mustache', 'r') as f:
                                 Block = chevron.render(f, {'cde':"s_onset"})
                             queryText = queryText + Block
-                            with open('templates/block6_CLOSE.mustache', 'r') as f:
-                                Block = chevron.render(f, {})
-                            queryText = queryText + Block
-                            with open('templates/block6_CLOSE.mustache', 'r') as f:
-                                Block = chevron.render(f, {})
-                            queryText = queryText + Block
+                            queryText = queryText + "}"
+                            queryText = queryText + "}"
                         else:
-                            sys.exit( "You have used unpermitted filter for this repository, filter for AGE OF SYMPTOM ONSET is not available")
+                            sys.exit( "AGE OF SYMPTOM ONSET ({parameter.type}) filter not permitted.")
 
                     # AGE_AT_DIAGNOSIS FILTER
                     elif parameter.type == "obo:NCIT_C156420" or parameter.type == "http://purl.obolibrary.org/obo/NCIT_C156420":
@@ -451,180 +414,88 @@ class QueryBuilder:
                             with open('templates/block2_GENERAL.mustache', 'r') as f:
                                 Block = chevron.render(f, {
                                             'process': "sio:SIO_000006",
-                                            'operator_target': "=",
-                                            'target': "sio:SIO_000015",
                                             'operator_attribute': "=",
                                             'attribute': "obo:NCIT_C68615",
                                             'operator_output': "=",
+                                            'instance': "output_type",
                                             'output': "sio:SIO_000015",
                                             'cde':"d_birthdate"})                                                                         
                             queryText = queryText + Block
-                            with open('templates/block5_CONTEXT.mustache', 'r') as f:
+                            with open('templates/block4_STARTDATE.mustache', 'r') as f:
                                 Block = chevron.render(f, {'cde':"d_birthdate"})
                             queryText = queryText + Block
                                                         
                             with open('templates/block2_GENERAL.mustache', 'r') as f:
                                 Block = chevron.render(f, {
-                                            'process': "sio:SIO_000006",
-                                            'operator_target': "=",
-                                            'target': "sio:SIO_000015",
+                                            'process': "obo:NCIT_C18020",
                                             'operator_attribute': "=",
-                                            'attribute': "sio:SIO_000614",
+                                            'attribute': "obo:NCIT_C7057",
+                                            'instance': "output_type",
                                             'operator_output': "=",
-                                            'output': "obo:NCIT_C154625",
+                                            'output': "obo:OGMS_0000073",
                                             'cde':"d_onset"})  
                             queryText = queryText + Block
-                            with open('templates/block5_CONTEXT.mustache', 'r') as f:
+                            with open('templates/block4_STARTDATE.mustache', 'r') as f:
                                 Block = chevron.render(f, {'cde':"d_onset"})
                             queryText = queryText + Block
-                            with open('templates/block6_CLOSE.mustache', 'r') as f:
-                                Block = chevron.render(f, {})
-                            queryText = queryText + Block
-                            with open('templates/block6_CLOSE.mustache', 'r') as f:
-                                Block = chevron.render(f, {})
-                            queryText = queryText + Block 
+                            queryText = queryText + "}"
+                            queryText = queryText + "}" 
+                            
                         else:
-                            sys.exit("You have used unpermitted filter for this repository, filter for AGE OF DIAGNOSIS is not available")                            
+                            sys.exit("AGE OF DIAGNOSIS ({parameter.type}) filter not permitted.")                            
                             
                 else:
                     # DISEASE FILTER
+                    # Disease is the default filter, even if parameter.type is defined or not.
                     if self.FILTER_DISEASE == "True":
-                        if self.FILTER_DISEASE == "True":
-                            stamp = "disease" + milisec()
+                        stamp = f"f_disease_{i}"
 
-                            if isinstance(parameter.id, str):
-                                with open('templates/block2_GENERAL.mustache', 'r') as f:
-                                    Block = chevron.render(f, {
-                                        'process': "sio:SIO_000006",
-                                        'operator_target': "=",
-                                        'target': "sio:SIO_000015",
-                                        'operator_attribute': "=",
-                                        'attribute':parameter.id,
-                                        'operator_output': "=",
-                                        'output': "obo:NCIT_C154625",
-                                        'cde':stamp})  
-                                queryText = queryText + Block
-                                
-                                with open('templates/block6_CLOSE.mustache', 'r') as f:
-                                    Block = chevron.render(f, {})
-                                queryText = queryText + Block
-                                   
-                            elif isinstance(parameter.id, list):
-                                curated_values = self.curate_values(parameter.id, tag="ont")
-
-                                with open('templates/block2_GENERAL.mustache', 'r') as f:
-                                    Block = chevron.render(f, {
-                                        'process': "sio:SIO_000006",
-                                        'operator_target': "=",
-                                        'target': "sio:SIO_000015",
-                                        'operator_attribute': "!=",
-                                        'attribute': "sio:SIO_000614",
-                                        'operator_output': "=",
-                                        'output': "obo:NCIT_C154625",
-                                        'cde':stamp})                                       
-                                queryText = queryText + Block
-                                                                
-                                with open('templates/block4_VALUES.mustache', 'r') as f:
-                                    Block = chevron.render(f, {
-                                        'instance': "attribute_type",
-                                        'values': curated_values,
-                                        'cde':stamp})                                       
-                                queryText = queryText + Block
-                                
-                                with open('templates/block6_CLOSE.mustache', 'r') as f:
-                                    Block = chevron.render(f, {})
-                                queryText = queryText + Block
-                                
-                    else:
-                        sys.exit( "You have used unpermitted filter for this repository, filter for DISEASE is not available")   
-
-            # SYMPTOM + SYMPTOM ONSET FILTER
-            if ("sio:SIO_010056" in list_filters_used or "http://semanticscience.org/resource/SIO_010056" in list_filters_used) and ("obo:NCIT_C124353" in list_filters_used or "http://purl.obolibrary.org/obo/NCIT_C124353" in list_filters_used):
-                if (self.FILTER_SYMPTOM == "True") and (self.FILTER_AGE_SYMPTOM_ONSET == "True"):
-                    for parameter in input_data.query.filters:
-                        if parameter.type =="sio:SIO_010056" or parameter.type =="http://semanticscience.org/resource/SIO_010056":
-                            symp_info = parameter
-
-                        elif parameter.type == "obo:NCIT_C124353" or parameter.type =="http://purl.obolibrary.org/obo/NCIT_C124353":
-                            onset_info = parameter        
-                                
-                    parameter_checked = self.detect_number_type(onset_info.id)
-                            
-                    # SYMPTOM + SYMPTOM ONSET FILTER
-                    with open('templates/block1b_BIND.mustache', 'r') as f:
-                        Block = chevron.render(f, {'value': onset_info.id, 'operator': onset_info.operator , 'st':"s_", 'cde':"s_onset", "cde2":"s_birthdate"})
-                    queryText = queryText + Block
-                    with open('templates/block2_GENERAL.mustache', 'r') as f:
-                        Block = chevron.render(f, {
-                                    'process': "sio:SIO_000006",
-                                    'operator_target': "=",
-                                    'target': "sio:SIO_000015",
+                        if isinstance(parameter.id, str):
+                            with open('templates/block2_GENERAL.mustache', 'r') as f:
+                                Block = chevron.render(f, {
+                                    'process': "obo:NCIT_C18020",
                                     'operator_attribute': "=",
-                                    'attribute': "obo:NCIT_C68615",
+                                    'attribute': "obo:NCIT_C7057",
+                                    'instance': "output_identifier",
                                     'operator_output': "=",
-                                    'output': "sio:SIO_000015",
-                                    'cde':"s_birthdate"})  
-                    queryText = queryText + Block
-                    with open('templates/block5_CONTEXT.mustache', 'r') as f:
-                        Block = chevron.render(f, {'cde':"s_birthdate"})
-                    queryText = queryText + Block
+                                    'output': parameter.id,
+                                    'cde':stamp})  
+                            queryText = queryText + Block                          
+                            queryText = queryText + "}"
 
-                    if isinstance(symp_info.id, str):
-                        with open('templates/block2_GENERAL.mustache', 'r') as f:                    
-                            Block = chevron.render(f, {
-                                'process': "sio:SIO_000006",
-                                'operator_target': symp_info.operator,
-                                'target': symp_info.id,
-                                'operator_attribute': "=",
-                                'attribute': "obo:NCIT_C124353",
-                                'operator_output': "=",
-                                'output': "sio:SIO_000015",
-                                'cde':"s_onset"})  
-                        queryText = queryText + Block
+                        elif isinstance(parameter.id, list):
+                            curated_values = self.curate_values(parameter.id, tag="ont")
 
-     
-                    elif isinstance(symp_info.id, list):
-                        
-                        curated_values = self.curate_values(symp_info.id)
+                            with open('templates/block2_GENERAL.mustache', 'r') as f:
+                                Block = chevron.render(f, {
+                                    'process': "obo:NCIT_C18020",
+                                    'operator_attribute': "=",
+                                    'attribute': "obo:NCIT_C7057",
+                                    'instance': "output_type",
+                                    'operator_output': "=",
+                                    'output': "obo:OGMS_0000073",
+                                    'cde': stamp})                                      
+                            queryText = queryText + Block
+                                                            
+                            with open('templates/block3c_VALUES.mustache', 'r') as f:
+                                Block = chevron.render(f, {
+                                    'instance': "output_identifier",
+                                    'values': curated_values,
+                                    'cde':stamp})                                       
+                            queryText = queryText + Block
+                            queryText = queryText + "}"
+                                       
+                        else:
+                            sys.exit( "DISEASE ({parameter.type}) filter not permitted.")   
 
-                        with open('templates/block2_GENERAL.mustache', 'r') as f:                    
-                            Block = chevron.render(f, {
-                                'process': "sio:SIO_000006",
-                                'operator_target': "!=",
-                                'target': "sio:SIO_000015",
-                                'operator_attribute': "=",
-                                'attribute': "obo:NCIT_C124353",
-                                'operator_output': "=",
-                                'output': "sio:SIO_000015",
-                                'cde':"s_onset"})                         
-                        queryText = queryText + Block   
-                           
-                        with open('templates/block4_VALUES.mustache', 'r') as f:
-                            Block = chevron.render(f, {
-                                'instance': "target_type",
-                                'values': curated_values,
-                                'cde':"s_onset"})                                       
-                        queryText = queryText + Block      
-                        
-                    with open('templates/block5_CONTEXT.mustache', 'r') as f:
-                        Block = chevron.render(f, {'cde':"s_onset"})
-                    queryText = queryText + Block
-                    with open('templates/block6_CLOSE.mustache', 'r') as f:
-                        Block = chevron.render(f, {})
-                    queryText = queryText + Block
-                    with open('templates/block6_CLOSE.mustache', 'r') as f:
-                        Block = chevron.render(f, {})
-                    queryText = queryText + Block        
-                else:
-                    sys.exit( "You have used unpermitted filter for this repository, neither SYMPTOM nor AGE OF SYMPTOM ONSET is available")
+            queryText = queryText + "}"       
 
-            with open('templates/block6_CLOSE.mustache', 'r') as f:
-                Block = chevron.render(f, {})
-            queryText = queryText + Block
         else:
             sys.exit("Any of the parameters you passed is not corrected, please check you input JSON request body")
-            
-        # stamp_file = "file" + milisec() + ".ttl"
+           
+        # Debugging 
+        
+        # stamp_file = "latest_query.ttl"
         # f = open(stamp_file, "a")
         # f.write(queryText)
         # f.close()

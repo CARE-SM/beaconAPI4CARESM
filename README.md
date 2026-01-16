@@ -225,13 +225,13 @@ You can run the docker image in a `docker-compose` file that contains your envir
 version: '3'
 services:
   api:
-    image: pabloalarconm/beacon-api4care-sm:4.0.0
+    image: pabloalarconm/beacon-api4care-sm:4.2.0
     ports:
       - "8000:8000"
     environment:
-      - TRIPLESTORE_URL=http://localhost:7200/repositories/exemplar_vp_repo #exemplar endpoint
+      - TRIPLESTORE_URL=http://IP:PORT/YOUR_ENDPOINT/
       - TRIPLESTORE_USERNAME=admin
-      - TRIPLESTORE_PASSWORD=root
+      - TRIPLESTORE_PASSWORD=password
       - URL_SERVER=http://0.0.0.0:8000/
       - PROXY_PATH=proxy
 
